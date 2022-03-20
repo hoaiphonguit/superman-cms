@@ -1,0 +1,64 @@
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "liemtt",
+    "password": "passlagi123"
+}
+
+###
+
+
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "phongvh",
+    "password": "passlagi123"
+}
+
+###
+
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "phongvh",
+    "password": "passlagi123"
+}
+
+###
+
+POST http://localhost:5000/api/post/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA
+
+{
+    "title": "This is a test title",
+    "description": "This is a test description",
+    "url": "google.com",
+    "status": "LEARNING"
+}
+
+###
+
+GET http://localhost:5000/api/post/list
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA
+
+###
+
+PUT http://localhost:5000/api/post/622f5064340d52c847b290b8
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA
+
+{
+    "title": "This is a test title ahihi",
+    "description": "This is a test description",
+    "url": "google.com",
+    "status": "LEARNING"
+}
+###
+
+DELETE http://localhost:5000/api/post/622f4fe6f96dcc6e190c8b9e
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA
