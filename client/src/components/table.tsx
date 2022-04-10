@@ -98,7 +98,7 @@ function SuperTable<T>({
                                 />
                             </TableCell> */}
                             {columns.map((column) => (
-                                <StyledTableCell
+                                <TableCell
                                     key={column.id as any}
                                     align={column.align}
                                     style={{ minWidth: column.minWidth }}
@@ -127,7 +127,7 @@ function SuperTable<T>({
                                             </Box>
                                         ) : null} */}
                                     </TableSortLabel>
-                                </StyledTableCell>
+                                </TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
@@ -141,7 +141,7 @@ function SuperTable<T>({
                                 const isItemSelected = isSelected(index);
                                 const labelId = `enhanced-table-checkbox-${index}`;
                                 return (
-                                    <StyledTableRow
+                                    <TableRow
                                         hover
                                         role="checkbox"
                                         // selected={isItemSelected}
@@ -160,7 +160,7 @@ function SuperTable<T>({
                                         {columns.map((column) => {
                                             const value = row[column.id];
                                             return (
-                                                <StyledTableCell
+                                                <TableCell
                                                     key={column.id as any}
                                                     align={column.align}
                                                 >
@@ -168,10 +168,10 @@ function SuperTable<T>({
                                                     typeof value === 'number'
                                                         ? column.format(value)
                                                         : value}
-                                                </StyledTableCell>
+                                                </TableCell>
                                             );
                                         })}
-                                    </StyledTableRow>
+                                    </TableRow>
                                 );
                             })}
                     </TableBody>

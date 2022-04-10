@@ -6,7 +6,6 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { ThemeProvider } from '@mui/material/styles';
 import Footer from 'src/layout/components/footer';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -24,8 +23,6 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuth } from 'src/redux/actions/auth';
 import { authSelector } from 'src/redux/selectors/auth';
-import { supermanTheme } from 'src/App';
-
 const LoginView = () => {
     const [state, loginFn] = useAsyncFn(AuthService.loginUser);
     const navigate = useNavigate();
@@ -90,7 +87,7 @@ const LoginView = () => {
     }
 
     return (
-        <ThemeProvider theme={supermanTheme}>
+        <>
             {state?.value && <Alert {...state.value} />}
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
@@ -172,7 +169,7 @@ const LoginView = () => {
                     </Box>
                 </Grid>
             </Grid>
-        </ThemeProvider>
+        </>
     );
 };
 

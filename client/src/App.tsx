@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useAsync } from 'react-use';
+import { useAsync, useToggle } from 'react-use';
 import Spinner from './components/spinner';
 import { IAuth, IUser } from './interfaces';
 import Layout from 'src/layout';
@@ -11,14 +11,22 @@ import { authSelector } from './redux/selectors/auth';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import AppRoutes from './routes';
 
-export const supermanTheme = createTheme();
 const App = () => {
     const state = useAsync(AuthService.auth);
     const dispatch = useDispatch();
     const authState = useSelector(authSelector);
+    const [mode, setMode] = useToggle(false);
+    const theme = useMemo(
+        () =>
+          createTheme({
+            palette: {
+              mode: mode ? 'light' : 'dark',
+            },
+          }),
+        [mode],
+      );
 
     useEffect(() => {
-        console.log('state', state);
         let authState: IAuth = {
             loading: false,
             isAuthenticated: false,
@@ -46,7 +54,7 @@ const App = () => {
     }
 
     return (
-        <ThemeProvider theme={supermanTheme}>
+        <ThemeProvider theme={theme}>
             <Layout>
                 <AppRoutes />
             </Layout>
