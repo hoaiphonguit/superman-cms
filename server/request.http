@@ -23,9 +23,15 @@ POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "phongvh",
+    "username": "phongvh",`
     "password": "passlagi123"
 }
+
+###
+
+GET http://localhost:5000/api/auth
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA
 
 ###
 
@@ -60,5 +66,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmN
 ###
 
 DELETE http://localhost:5000/api/post/622f4fe6f96dcc6e190c8b9e
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA
+
+###
+
+GET http://localhost:5000/api/user/list
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA
