@@ -14,7 +14,6 @@ export const ColorModeContext = createContext({
 });
 
 const Layout = ({ children }) => {
-    const [open, setOpen] = useState(true);
     const isDarkmode =
         localStorage[LOCAL_STORAGE_DARK_MODE] === 'true' ? true : false;
     const [mode, setMode] = useToggle(isDarkmode);
@@ -39,8 +38,8 @@ const Layout = ({ children }) => {
             <ThemeProvider theme={theme}>
                 <Box sx={{ display: 'flex' }}>
                     <CssBaseline />
-                    <Header open={open} setOpen={setOpen} />
-                    <SideMenu open={open} setOpen={setOpen} />
+                    <Header />
+                    <SideMenu />
                     <Box
                         component="main"
                         sx={{

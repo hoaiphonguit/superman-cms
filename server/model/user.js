@@ -19,8 +19,20 @@ const UserSchema = new Schema({
         type: String,
     },
     createdAt: {
-        type: Date,
-        default: Date.now,
+        type: Number,
+        default: new Date().getTime(),
+    },
+    deleted: {
+        type: Number,
+        default: 0,
+    },
+    lastActivity: {
+        type: Number,
+        default: 0,
+    },
+    baned: {
+        type: Number,
+        default: 0,
     },
 });
 

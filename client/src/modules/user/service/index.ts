@@ -55,6 +55,23 @@ export const UserService = {
             }
         }
     },
+    delete: async (id: string) => {
+        if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
+            setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
+            try {
+                const response = await axios.delete(`${API_URL}/user/${id}`);
+                return response.data;
+            } catch (error: any) {
+                if (error.response.data) {
+                    return error.response.data;
+                }
+                return {
+                    success: false,
+                    message: error.message,
+                };
+            }
+        }
+    },
 };
 
 export default UserService;

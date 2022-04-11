@@ -9,7 +9,9 @@ export interface IUser {
     username: string;
     name: string;
     phone?: string;
-    lastLogin?: Date;
+    lastActivity?: number;
+    avatar?: string;
+    baned?: number;
 }
 
 export interface ILogin {

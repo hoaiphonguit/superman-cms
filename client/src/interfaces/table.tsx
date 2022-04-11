@@ -1,3 +1,5 @@
+import { IconButtonPropsColorOverrides } from '@mui/material';
+import { OverridableStringUnion } from '@mui/types';
 import { ReactNode } from 'react';
 
 export interface IColumn<T> {
@@ -21,8 +23,20 @@ export interface ITable<T> {
     hasIndex?: boolean;
     actions?: {
         label: string;
+        width?: number;
         actions: {
-            icon: string;
+            icon: string | ((row: T) => string);
+            color?: OverridableStringUnion<
+                | 'inherit'
+                | 'default'
+                | 'primary'
+                | 'secondary'
+                | 'error'
+                | 'info'
+                | 'success'
+                | 'warning',
+                IconButtonPropsColorOverrides
+            >;
             onClick: any;
         }[];
     };

@@ -120,13 +120,20 @@ router.post('/login', async (req, res) => {
  */
 router.get('/', verifyToken, async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select('-password');
+        const userUpdateCondition = { _id: req.userId, deleted: 0 };
+        const updateUser = { lastActivity: new Date().getTime() };
+        const user = await User.findOneAndUpdate(
+            userUpdateCondition,
+            updateUser,
+            { new: false }
+        ).select('-password');
         if (!user) {
             return res.status(400).json({
                 success: false,
                 message: 'Inccorect username or password',
             });
         }
+
         return res.json({
             success: true,
             message: 'User authenticated successfully',

@@ -9,7 +9,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { ITable } from 'src/interfaces/table';
-import { Icon } from '@mui/material';
+import { Icon, IconButton } from '@mui/material';
 
 function SuperTable<T>({
     columns,
@@ -53,7 +53,16 @@ function SuperTable<T>({
                 flexDirection: 'column',
             }}
         >
-            <TableContainer sx={{ maxHeight: 440 }}>
+            <TablePagination
+                rowsPerPageOptions={[10, 25, 50, 100]}
+                component="div"
+                count={data.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+            <TableContainer>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
                         <TableRow>
@@ -116,7 +125,7 @@ function SuperTable<T>({
                             {actions && (
                                 <TableCell
                                     align={'center'}
-                                    style={{ width: 120 }}
+                                    style={{ width: actions.width || 120 }}
                                 >
                                     <TableSortLabel>
                                         {actions.label}
@@ -169,22 +178,36 @@ function SuperTable<T>({
                                             );
                                         })}
                                         {actions && (
-                                            <TableCell>
+                                            <TableCell
+                                                style={{
+                                                    width: actions.width || 120,
+                                                }}
+                                            >
                                                 {actions.actions.map(
                                                     (action, i) => (
-                                                        <Icon
+                                                        <IconButton
+                                                            size="small"
                                                             onClick={() =>
                                                                 action.onClick(
                                                                     row
                                                                 )
                                                             }
                                                             key={i}
-                                                            style={{
-                                                                cursor: 'pointer',
-                                                            }}
+                                                            color={
+                                                                action.color ||
+                                                                'inherit'
+                                                            }
                                                         >
-                                                            {action.icon}
-                                                        </Icon>
+                                                            <Icon>
+                                                                {typeof action.icon ===
+                                                                'string'
+                                                                    ? action.icon
+                                                                    : typeof action.icon ===
+                                                                      'function'
+                                                                    ? action.icon(row)
+                                                                    : ''}
+                                                            </Icon>
+                                                        </IconButton>
                                                     )
                                                 )}
                                             </TableCell>
@@ -196,7 +219,7 @@ function SuperTable<T>({
                 </Table>
             </TableContainer>
             <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
+                rowsPerPageOptions={[10, 25, 50, 100]}
                 component="div"
                 count={data.length}
                 rowsPerPage={rowsPerPage}

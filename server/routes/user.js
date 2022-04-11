@@ -2,7 +2,6 @@ const express = require('express');
 const { verifyToken } = require('../middleware/auth');
 const router = express.Router();
 const User = require('../model/user');
-const { validUrl } = require('../utils/string');
 
 /**
  * @route GET /api/user/list
@@ -11,7 +10,10 @@ const { validUrl } = require('../utils/string');
  */
 router.get('/list', verifyToken, async (req, res) => {
     try {
-        const list = await User.find().select('-password');
+        const list = await User.find({ deleted: 0 }).select([
+            '-password',
+            '-deleted',
+        ]);
 
         return res.json({
             success: true,
@@ -32,18 +34,18 @@ router.get('/list', verifyToken, async (req, res) => {
  * @access Private
  */
 router.put('/:id', verifyToken, async (req, res) => {
-    const { username, password, name, phone } = req.body;
-    if (!username || !password || !name) {
+    const { username, name, phone, baned } = req.body;
+    if (!username || !name) {
         return res.status(400).json({
             success: false,
-            message: 'Missing username and/or password',
+            message: 'Missing username and/or name',
         });
     }
     try {
         const updateUser = {
-            username,
             name,
             phone,
+            baned,
         };
 
         const userUpdateCondition = { _id: req.params.id, username };
@@ -62,7 +64,7 @@ router.put('/:id', verifyToken, async (req, res) => {
             });
         }
 
-        return res.status(401).json({
+        return res.json({
             success: true,
             message: 'user update successfully',
         });
@@ -82,21 +84,25 @@ router.put('/:id', verifyToken, async (req, res) => {
  */
 router.delete('/:id', verifyToken, async (req, res) => {
     try {
-        const postDeleteCondtion = { _id: req.params.id, user: req.userId };
-        const deletedPost = await Post.findOneAndDelete(postDeleteCondtion);
+        const userUpdateCondition = { _id: req.params.id };
+        const updateUser = { deleted: 1 };
+        const updatedUser = await User.findOneAndUpdate(
+            userUpdateCondition,
+            updateUser,
+            { new: true }
+        );
 
         // User not authorised to update post or post not found
-        if (!deletedPost) {
+        if (!updatedUser) {
             return res.status(401).json({
                 success: false,
-                message: 'Post not found or user not authorised',
+                message: 'User not found or user not authorised',
             });
         }
 
-        return res.status(401).json({
+        return res.json({
             success: true,
-            message: 'Post delete successfully',
-            post: deletedPost,
+            message: 'User deleted successfully',
         });
     } catch (error) {
         console.log(error);

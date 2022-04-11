@@ -24,6 +24,23 @@ export const AuthService = {
             };
         }
     },
+    logoutUser: async (): Promise<any> => {
+        try {
+            localStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);
+            return {
+                success: true,
+                message: 'User logout successfully',
+            };
+        } catch (error: any) {
+            if (error.response.data) {
+                return error.response.data;
+            }
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+    },
     registerUser: async (data: IUser): Promise<any> => {
         try {
             const response = await axios.post(`${API_URL}/auth/register`, data);

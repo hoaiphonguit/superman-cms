@@ -1,40 +1,23 @@
-import { Dispatch, memo, SetStateAction } from 'react';
+import { memo } from 'react';
 import { styled } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import Divider from '@mui/material/Divider';
 import { drawerWidth } from 'src/constants';
-
 import Itemlist from './itemlist';
 import { useAsync } from 'react-use';
 import { INavigator } from 'src/interfaces/app';
 import AppService from 'src/modules/app/service';
+import { Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 
-const Drawer = styled(MuiDrawer, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
+const Drawer = styled(MuiDrawer)(({ theme }) => ({
     '& .MuiDrawer-paper': {
         position: 'relative',
         whiteSpace: 'nowrap',
-        width: drawerWidth,
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
         boxSizing: 'border-box',
-        ...(!open && {
-            overflowX: 'hidden',
-            transition: theme.transitions.create('width', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-            width: theme.spacing(7),
-            [theme.breakpoints.up('sm')]: {
-                width: theme.spacing(9),
-            },
-        }),
+        overflowX: 'hidden',
+        width: drawerWidth,
         a: {
             textDecoration: 'none',
             color: 'inherit',
@@ -46,20 +29,12 @@ const Drawer = styled(MuiDrawer, {
     },
 }));
 
-interface IProps {
-    open: boolean;
-    setOpen: Dispatch<SetStateAction<boolean>>;
-}
-const SideMenu = ({ open, setOpen }: IProps) => {
-    const toggleDrawer = () => {
-        setOpen(!open);
-    };
-
+const SideMenu = () => {
     const state = useAsync(AppService.appConfig);
     const list: INavigator[] = state.value?.list || [];
 
     return (
-        <Drawer variant="permanent" open={open}>
+        <Drawer variant="permanent" open={true}>
             <Toolbar
                 sx={{
                     display: 'flex',
@@ -68,9 +43,17 @@ const SideMenu = ({ open, setOpen }: IProps) => {
                     px: [1],
                 }}
             >
-                <IconButton onClick={toggleDrawer}>
-                    <ChevronLeftIcon />
-                </IconButton>
+                <Typography
+                    component="h1"
+                    variant="h6"
+                    color="inherit"
+                    noWrap
+                    sx={{ flexGrow: 1 }}
+                >
+                    <Link to="/">
+                        <img src="/images/superman_icon.png" width={60} />
+                    </Link>
+                </Typography>
             </Toolbar>
             <Divider />
             {list
