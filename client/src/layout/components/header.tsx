@@ -1,4 +1,4 @@
-import { Dispatch, memo, SetStateAction } from 'react';
+import { Dispatch, memo, SetStateAction, useContext } from 'react';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps } from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -9,6 +9,10 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import { drawerWidth } from 'src/constants';
 import { Link } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
+import { ColorModeContext } from 'src/layout';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 interface IAppBar extends AppBarProps {
     open: boolean;
@@ -29,6 +33,9 @@ const AppBar = styled(MuiAppBar, {
             duration: theme.transitions.duration.enteringScreen,
         }),
     }),
+    a: {
+        display: 'flex',
+    },
 }));
 
 interface IProps {
@@ -39,6 +46,8 @@ const Header = ({ open, setOpen }: IProps) => {
     const toggleDrawer = () => {
         setOpen(!open);
     };
+    const theme = useTheme();
+    const colorMode = useContext(ColorModeContext);
     return (
         <AppBar position="absolute" open={open}>
             <Toolbar
@@ -65,8 +74,20 @@ const Header = ({ open, setOpen }: IProps) => {
                     noWrap
                     sx={{ flexGrow: 1 }}
                 >
-                    <Link to="/">Superman CMS</Link>
+                    <Link to="/">
+                        <img src="/images/superman_icon.png" width={60} />
+                    </Link>
                 </Typography>
+                <IconButton
+                    onClick={() => colorMode.toggleColorMode()}
+                    color="inherit"
+                >
+                    {theme.palette.mode === 'dark' ? (
+                        <Brightness7Icon />
+                    ) : (
+                        <Brightness4Icon />
+                    )}
+                </IconButton>
                 <IconButton color="inherit">
                     <Badge badgeContent={4} color="secondary">
                         <NotificationsIcon />

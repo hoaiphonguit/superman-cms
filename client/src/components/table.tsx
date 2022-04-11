@@ -1,41 +1,15 @@
 import { memo, useState } from 'react';
-import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Box from '@mui/material/Box';
-import { visuallyHidden } from '@mui/utils';
 import { ITable } from 'src/interfaces/table';
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-        'span:hover': {
-            color: theme.palette.common.white,
-        },
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-    },
-    // hide last border
-    '&:last-child td, &:last-child th': {
-        border: 0,
-    },
-}));
+import { Icon } from '@mui/material';
 
 function SuperTable<T>({
     columns,
@@ -46,6 +20,8 @@ function SuperTable<T>({
     orderBy,
     order,
     onSort,
+    hasIndex,
+    actions,
 }: ITable<T>) {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -97,6 +73,14 @@ function SuperTable<T>({
                                     }}
                                 />
                             </TableCell> */}
+                            {hasIndex && (
+                                <TableCell
+                                    align={'center'}
+                                    style={{ width: 110 }}
+                                >
+                                    <TableSortLabel>Thứ tự</TableSortLabel>
+                                </TableCell>
+                            )}
                             {columns.map((column) => (
                                 <TableCell
                                     key={column.id as any}
@@ -129,6 +113,16 @@ function SuperTable<T>({
                                     </TableSortLabel>
                                 </TableCell>
                             ))}
+                            {actions && (
+                                <TableCell
+                                    align={'center'}
+                                    style={{ width: 120 }}
+                                >
+                                    <TableSortLabel>
+                                        {actions.label}
+                                    </TableSortLabel>
+                                </TableCell>
+                            )}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -157,6 +151,9 @@ function SuperTable<T>({
                                                 }}
                                             />
                                         </TableCell> */}
+                                        {hasIndex && (
+                                            <TableCell>{index + 1}</TableCell>
+                                        )}
                                         {columns.map((column) => {
                                             const value = row[column.id];
                                             return (
@@ -171,6 +168,27 @@ function SuperTable<T>({
                                                 </TableCell>
                                             );
                                         })}
+                                        {actions && (
+                                            <TableCell>
+                                                {actions.actions.map(
+                                                    (action, i) => (
+                                                        <Icon
+                                                            onClick={() =>
+                                                                action.onClick(
+                                                                    row
+                                                                )
+                                                            }
+                                                            key={i}
+                                                            style={{
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            {action.icon}
+                                                        </Icon>
+                                                    )
+                                                )}
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 );
                             })}

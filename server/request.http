@@ -74,3 +74,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmN
 GET http://localhost:5000/api/user/list
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA
+###
+
+GET http://localhost:5000/api/appConfig
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTA1NDM0MGQ1MmM4NDdiMjkwYjYiLCJpYXQiOjE2NDcyNjc5MjR9.jINYqPit_b9ZWUvsEQoaLOq0sJy9Qk-xfkovgVBcPKA

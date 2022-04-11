@@ -12,9 +12,9 @@ require('dotenv').config({ path: './.env' });
  * @access Public
  */
 router.post('/register', async (req, res) => {
-    const { username, password, name } = req.body;
+    const { username, password, name, phone } = req.body;
 
-    if (!username || !password) {
+    if (!username || !password || !name) {
         return res.status(400).json({
             success: false,
             message: 'Missing username and/or password',
@@ -30,7 +30,12 @@ router.post('/register', async (req, res) => {
         }
         // All good
         const hashedPassword = await argon2.hash(password);
-        const newUser = new User({ username, password: hashedPassword });
+        const newUser = new User({
+            username,
+            password: hashedPassword,
+            name,
+            phone,
+        });
         await newUser.save();
 
         // Return token

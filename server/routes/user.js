@@ -32,43 +32,39 @@ router.get('/list', verifyToken, async (req, res) => {
  * @access Private
  */
 router.put('/:id', verifyToken, async (req, res) => {
-    const { title, description, status, url } = req.body;
-    if (!title || !description) {
-        return res
-            .status(400)
-            .json({
-                success: false,
-                message: 'Missing Title and/or Description',
-            });
+    const { username, password, name, phone } = req.body;
+    if (!username || !password || !name) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing username and/or password',
+        });
     }
     try {
-        const updatePost = {
-            title,
-            description,
-            status: status || 'TO_LEARN',
-            url: validUrl(url) || '',
+        const updateUser = {
+            username,
+            name,
+            phone,
         };
 
-        const postUpdateCondition = { _id: req.params.id, author: req.userId };
+        const userUpdateCondition = { _id: req.params.id, username };
 
-        updatedPost = await Post.findOneAndUpdate(
-            postUpdateCondition,
-            updatedPost,
+        updatedUser = await User.findOneAndUpdate(
+            userUpdateCondition,
+            updateUser,
             { new: true }
         );
 
         // User not authorised to update post or post not found
-        if (!updatePost) {
+        if (!updatedUser) {
             return res.status(401).json({
                 success: false,
-                message: 'Post not found or user not authorised',
+                message: 'User not found',
             });
         }
 
         return res.status(401).json({
             success: true,
-            message: 'Post update successfully',
-            post: updatePost,
+            message: 'user update successfully',
         });
     } catch (error) {
         console.log(error);
@@ -101,6 +97,34 @@ router.delete('/:id', verifyToken, async (req, res) => {
             success: true,
             message: 'Post delete successfully',
             post: deletedPost,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+});
+
+/**
+ * @route GET /api/user/:id
+ * @desc Get user
+ * @access Private
+ */
+router.get('/:id', verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password');
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Inccorect username or password',
+            });
+        }
+        return res.json({
+            success: true,
+            message: 'User authenticated successfully',
+            user,
         });
     } catch (error) {
         console.log(error);

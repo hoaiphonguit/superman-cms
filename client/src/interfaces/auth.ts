@@ -5,9 +5,11 @@ export interface IAuth {
 }
 
 export interface IUser {
-    id: string;
+    _id: string;
     username: string;
     name: string;
+    phone?: string;
+    lastLogin?: Date;
 }
 
 export interface ILogin {

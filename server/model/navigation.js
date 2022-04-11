@@ -1,27 +1,25 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const UserSchema = new Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
+const NavigationItem = new Schema({
     name: {
         type: String,
         required: true,
     },
-    phone: {
+    url: {
         type: String,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
     },
 });
 
-module.exports = mongoose.model('users', UserSchema);
+const NavigationSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    url: {
+        type: String,
+    },
+    children: [NavigationItem],
+});
+
+module.exports = mongoose.model('navigations', NavigationSchema);
