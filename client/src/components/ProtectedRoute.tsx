@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
-import { authSelector } from 'src/redux/selectors/auth';
+import { authSelector } from 'src/redux/selectors';
 
 const ProtectedRoute = () => {
     const authState = useSelector(authSelector);

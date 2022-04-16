@@ -1,15 +1,18 @@
 import { memo, useState } from 'react';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
 import { ITable } from 'src/interfaces/table';
-import { Icon, IconButton } from '@mui/material';
+import {
+    Icon,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TableSortLabel,
+} from '@mui/material';
 
 function SuperTable<T>({
     columns,
@@ -204,7 +207,9 @@ function SuperTable<T>({
                                                                     ? action.icon
                                                                     : typeof action.icon ===
                                                                       'function'
-                                                                    ? action.icon(row)
+                                                                    ? action.icon(
+                                                                          row
+                                                                      )
                                                                     : ''}
                                                             </Icon>
                                                         </IconButton>

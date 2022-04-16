@@ -1,17 +1,12 @@
 import { memo, useEffect, useState } from 'react';
-import Grid from '@mui/material/Grid';
-import Toolbar from '@mui/material/Toolbar';
 import { useAsyncFn } from 'react-use';
-import UserService from '../../service';
-import SuperTable from 'src/components/table';
-import { IColumn } from 'src/interfaces/table';
-import { IUser } from 'src/interfaces';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import { UserService } from 'src/modules/user';
+import { IUser, IColumn } from 'src/interfaces';
 import AddIcon from '@mui/icons-material/Add';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import ConfirmDialog from 'src/components/ConfirmDialog';
-import { format } from 'date-fns';
+import { ConfirmDialog, SuperTable } from 'src/components';
+import dayjs from 'dayjs';
+import { Button, Grid, Toolbar, Typography } from '@mui/material';
 
 const columns: IColumn<IUser>[] = [
     { id: 'username', label: 'Tên người dùng' },
@@ -21,7 +16,7 @@ const columns: IColumn<IUser>[] = [
         id: 'lastActivity',
         label: 'Hoạt động cuối',
         format: (value) =>
-            value > 0 ? format(value, 'yyyy-MM-dd HH:mm:ss') : '',
+            value > 0 ? dayjs(value).format('YYYY-MM-dd HH:mm:ss') : '',
     },
 ];
 
@@ -82,7 +77,7 @@ const UserListView = () => {
                 },
             },
             {
-                icon: (user) => (!!user.baned ? 'remove_moderator' : 'shield'),
+                icon: (user: IUser) => (!!user.baned ? 'remove_moderator' : 'shield'),
                 onClick: (user: IUser) => {
                     onBanUser(user);
                 },

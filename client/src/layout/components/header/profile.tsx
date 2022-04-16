@@ -1,7 +1,6 @@
 import {
     Avatar,
     Divider,
-    Fade,
     IconButton,
     ListItemIcon,
     Menu,
@@ -34,6 +33,7 @@ const Profile = () => {
 
     const handleLogout = async () => {
         const resp = await AuthService.logoutUser();
+        // tslint:disable-next-line: no-console
         console.log('resp', resp);
         if (resp.success) {
             dispatch(setAuth({ isAuthenticated: false, user: {} as IUser }));
@@ -88,16 +88,7 @@ const Profile = () => {
                 <MenuItem>
                     <Avatar /> {user.name}
                 </MenuItem>
-                <MenuItem>
-                    <Avatar /> My account
-                </MenuItem>
                 <Divider />
-                <MenuItem>
-                    <ListItemIcon>
-                        <PersonAdd fontSize="small" />
-                    </ListItemIcon>
-                    Add another account
-                </MenuItem>
                 <MenuItem>
                     <ListItemIcon>
                         <Settings fontSize="small" />

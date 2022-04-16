@@ -1,8 +1,7 @@
+import { Typography, Link } from '@mui/material';
 import { memo } from 'react';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
 
-const Footer = (props) => {
+const Footer = (props: any) => {
   return (
     <Typography
       variant="body2"

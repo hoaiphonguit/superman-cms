@@ -4,44 +4,24 @@
         "outDir": "build/dist",
         "module": "esnext",
         "target": "es5",
-        "typeRoots": [
-            "node_modules/@types"
-        ],
-        "lib": [
-            "es6",
-            "dom",
-            "esnext"
-        ],
+        "typeRoots": ["node_modules/@types"],
+        "lib": ["dom", "dom.iterable", "esnext"],
         "sourceMap": true,
-        "removeComments": true,
         "allowJs": true,
-        "jsx": "react-jsx",
+        "skipLibCheck": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "moduleResolution": "node",
-        "rootDir": "src",
-        "forceConsistentCasingInFileNames": true,
-        "noImplicitReturns": true,
-        "noImplicitThis": true,
-        "noImplicitAny": false,
-        "importHelpers": true,
-        "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "noUnusedLocals": false,
-        "skipLibCheck": true,
         "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "moduleResolution": "node",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "noEmit": true
+        "noEmit": true,
+        "jsx": "react-jsx"
     },
-    "include": [
-        "src",
-        "@types",
-        "src/**/*"
-    ],
-    "files": [
-        "src/types/global.d.ts"
-    ],
+    "include": ["src", "@types", "src/**/*"],
+    "files": ["src/types/global.d.ts"],
     "exclude": [
         "node_modules",
         "build",

@@ -1,9 +1,13 @@
+import { memo, useEffect, useState } from 'react';
 import { Alert, Snackbar } from '@mui/material';
-import { memo, useState } from 'react';
-import { IResponse } from 'src/interfaces/request';
+import { IResponse } from 'src/interfaces';
 
 const RequestAlert = ({ success, message }: IResponse) => {
     const [open, setOpen] = useState(true);
+
+    useEffect(() => {
+        setOpen(true);
+    }, [success, message]);
 
     const handleClose = () => {
         setOpen(false);

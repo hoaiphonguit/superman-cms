@@ -1,94 +1,94 @@
-import { memo, useEffect } from 'react';
-import Avatar from '@mui/material/Avatar';
-import CssBaseline from '@mui/material/CssBaseline';
-import Link from '@mui/material/Link';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Footer from 'src/layout/components/footer';
-import { yupResolver } from '@hookform/resolvers/yup';
-import {
-    FieldProp,
-    FormBuilder,
-    validationUtils,
-} from '@jeremyling/react-material-ui-form-builder';
-import { useForm } from 'react-hook-form';
+import { FormEvent, FormEventHandler, memo, useEffect } from 'react';
+import { Footer } from 'src/layout/components';
+import { Controller, useForm } from 'react-hook-form';
 import { useAsyncFn } from 'react-use';
-import AuthService from '../../service';
-import { IAuth, ILogin } from 'src/interfaces';
+import { IAuth, ILogin, IUser } from 'src/interfaces';
 import { LoadingButton } from '@mui/lab';
-import Alert from 'src/components/alert';
+import { RequestAlert } from 'src/components';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAuth } from 'src/redux/actions/auth';
-import { authSelector } from 'src/redux/selectors/auth';
+import { setAuth } from 'src/redux/actions';
+import { authSelector } from 'src/redux/selectors';
+import { AuthService } from 'src/modules/auth';
+import {
+    Avatar,
+    Box,
+    CssBaseline,
+    Grid,
+    Link,
+    Paper,
+    Typography,
+} from '@mui/material';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import FormBuilder from 'src/components/form/FormBuilder';
+import { method } from 'lodash';
+import { TFieldProp } from 'src/components/form/interface';
+
+const schema = yup
+    .object({
+        username: yup.string().required(),
+        password: yup.string().required(),
+    })
+    .required();
+
+const fields: Array<TFieldProp> = [
+    {
+        component: 'text-field' as 'text-field',
+        attribute: 'username',
+        label: 'Tên người dùng',
+        props: {
+            autoComplete: 'username',
+        },
+    },
+    {
+        component: 'text-field' as 'text-field',
+        attribute: 'password',
+        label: 'Mật khẩu',
+        props: {
+            type: 'password',
+            autoComplete: 'password',
+        },
+    },
+];
+
 const LoginView = () => {
     const [state, loginFn] = useAsyncFn(AuthService.loginUser);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const handleSubmit = (data) => {
+    const onSubmit = (data: any) => {
+        console.log('data', data);
         loginFn(data);
     };
     const authState = useSelector(authSelector);
-    const schema = validationUtils.getFormSchema(fields());
-    const methods = useForm<ILogin>({
-        mode: 'onTouched',
-        resolver: yupResolver(schema),
-    });
 
     useEffect(() => {
         if (state.value?.success) {
-            const authState: IAuth = {
+            const auth: IAuth = {
                 isAuthenticated: true,
                 user: state.value.user,
             };
-            dispatch(setAuth(authState));
+            dispatch(setAuth(auth));
             navigate('/', { replace: true });
         }
     }, [state]);
+
+    const methods = useForm({
+        defaultValues: {
+            username: 'phongvh',
+            password: '',
+        },
+        mode: 'onTouched',
+        resolver: yupResolver(schema),
+    });
 
     if (authState.isAuthenticated) {
         return <Navigate to="/" />;
     }
 
-    function fields(): Array<FieldProp> {
-        return [
-            {
-                component: 'text-field',
-                attribute: 'username',
-                label: 'Username',
-                props: {
-                    fullWidth: true,
-                    autoComplete: 'username',
-                },
-                validationType: 'string',
-                validations: [['required', true]],
-            },
-            {
-                component: 'text-field',
-                attribute: 'password',
-                label: 'Password',
-                props: {
-                    fullWidth: true,
-                    autoComplete: 'current-password',
-                    type: 'password',
-                },
-                validationType: 'string',
-                validations: [['required', true]],
-            },
-            {
-                component: 'switch',
-                attribute: 'remember',
-                label: 'Remember login',
-                options: [false, true],
-            },
-        ];
-    }
-
     return (
         <>
-            {state?.value && <Alert {...state.value} />}
+            {state?.value && <RequestAlert {...state.value} />}
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
                 <Grid
@@ -131,24 +131,23 @@ const LoginView = () => {
                         </Typography>
                         <Box
                             component="form"
-                            onSubmit={methods.handleSubmit(handleSubmit)}
-                            sx={{ mt: 1 }}
+                            onSubmit={methods.handleSubmit(onSubmit)}
+                            sx={{
+                                mt: 1,
+                                '& .MuiTextField-root': { m: 1 },
+                            }}
+                            noValidate
                         >
-                            <FormBuilder
-                                fields={fields()}
-                                methods={methods}
-                                defaultValue={null}
+                            <FormBuilder fields={fields} methods={methods} />
+                            <LoadingButton
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 2 }}
+                                loading={state.loading}
                             >
-                                <LoadingButton
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    sx={{ mt: 2 }}
-                                    loading={state.loading}
-                                >
-                                    Login
-                                </LoadingButton>
-                            </FormBuilder>
+                                Login
+                            </LoadingButton>
                             <Grid container sx={{ mt: 1 }}>
                                 <Grid item xs>
                                     <Link

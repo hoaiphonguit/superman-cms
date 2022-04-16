@@ -1,15 +1,20 @@
 import { memo, useContext } from 'react';
-import { styled } from '@mui/material/styles';
-import MuiAppBar, { AppBarProps } from '@mui/material/AppBar';
-import IconButton from '@mui/material/IconButton';
-import Toolbar from '@mui/material/Toolbar';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import Badge from '@mui/material/Badge';
 import { drawerWidth } from 'src/constants';
-import { useTheme } from '@mui/material/styles';
 import { ColorModeContext } from 'src/layout';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
+import {
+    Notifications as NotificationsIcon,
+    Brightness4 as Brightness4Icon,
+    Brightness7 as Brightness7Icon,
+} from '@mui/icons-material';
+import {
+    AppBarProps,
+    Badge,
+    IconButton,
+    AppBar as MuiAppBar,
+    styled,
+    Toolbar,
+    useTheme,
+} from '@mui/material';
 import Profile from './profile';
 
 const AppBar = styled(MuiAppBar)<AppBarProps>(({ theme }) => ({

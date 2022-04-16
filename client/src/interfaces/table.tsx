@@ -8,7 +8,7 @@ export interface IColumn<T> {
     minWidth?: number;
     align?: 'right' | 'left' | 'center';
     format?: (value: number) => string;
-    render?: (value) => ReactNode;
+    render?: (value: number) => ReactNode;
 }
 
 export interface ITable<T> {

@@ -1,24 +1,27 @@
-import { createContext, memo, useMemo, useState } from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
+import { createContext, memo, useMemo } from 'react';
 import { Header, SideMenu, Footer } from './components';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useToggle } from 'react-use';
 import { LOCAL_STORAGE_DARK_MODE } from 'src/constants';
+import {
+    Box,
+    Container,
+    createTheme,
+    CssBaseline,
+    Grid,
+    ThemeProvider,
+    Toolbar,
+} from '@mui/material';
 
 export const ColorModeContext = createContext({
     toggleColorMode: (): void => {},
 });
 
-const Layout = ({ children }) => {
+const Layout = ({ children }: { children: any }) => {
     const isDarkmode =
         localStorage[LOCAL_STORAGE_DARK_MODE] === 'true' ? true : false;
     const [mode, setMode] = useToggle(isDarkmode);
 
-    const theme = useMemo(
+    const appTheme = useMemo(
         () =>
             createTheme({
                 palette: {
@@ -35,7 +38,7 @@ const Layout = ({ children }) => {
 
     return (
         <ColorModeContext.Provider value={{ toggleColorMode }}>
-            <ThemeProvider theme={theme}>
+            <ThemeProvider theme={appTheme}>
                 <Box sx={{ display: 'flex' }}>
                     <CssBaseline />
                     <Header />

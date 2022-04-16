@@ -1,25 +1,31 @@
-import { memo, useEffect, useState } from 'react';
-import Grid from '@mui/material/Grid';
+import { memo, useEffect } from 'react';
 import { IUser } from 'src/interfaces';
-import Typography from '@mui/material/Typography';
-import { useAsync, useAsyncFn } from 'react-use';
+import { useAsyncFn } from 'react-use';
 import {
-    FieldProp,
-    FormBuilder,
-    validationUtils,
-} from '@jeremyling/react-material-ui-form-builder';
-import { Box, Card, CardHeader, Divider, Link, Paper } from '@mui/material';
+    Box,
+    Card,
+    CardHeader,
+    Divider,
+    Grid,
+    Link,
+    Paper,
+    styled,
+    Typography,
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import AuthService from 'src/modules/auth/service';
+import { AuthService } from 'src/modules/auth';
+import { UserService } from 'src/modules/user';
 import { useNavigate, useParams } from 'react-router-dom';
-import UserService from '../../service';
-import { isEmpty } from 'lodash';
 import UserInfo from './userinfo';
 import { Link as RouterLink } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { RequestAlert } from 'src/components';
+import { isEmpty, method } from 'lodash';
+import { TFieldProp } from 'src/components/form/interface';
+import FormBuilder from 'src/components/form/FormBuilder';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 const BoxUser = styled(Box)<{ component?: React.ElementType }>({
     '& .MuiLink-root': {
@@ -27,24 +33,67 @@ const BoxUser = styled(Box)<{ component?: React.ElementType }>({
     },
 });
 
+const schema = yup.object({
+    name: yup.string().required(),
+    phone: yup.string().required(),
+});
+
 const UserEditView = () => {
     const [state, registerFn] = useAsyncFn(AuthService.registerUser);
     const [updateState, updateFn] = useAsyncFn(UserService.update);
-    const [user, setUser] = useState<IUser>({} as IUser);
+    const [userState, getUserFn] = useAsyncFn(UserService.get);
     const navigate = useNavigate();
     const { id } = useParams();
-    const userState = useAsync(() => UserService.get(id || ''), [id]);
 
     useEffect(() => {
-        const _user = userState.value?.user;
-        if (_user) {
-            setUser(_user);
+        if (id) {
+            getUserFn(id);
         }
-    }, [userState]);
+    }, []);
 
-    const handleSubmit = (data: IUser) => {
+    const user: IUser = userState.value?.user || {};
+
+    const onSubmit = (data: any) => {
+        console.log('data', data);
         id ? updateFn(id, data) : registerFn(data);
     };
+
+    const fields: Array<TFieldProp> = [
+        {
+            component: 'text-field' as 'text-field',
+            attribute: 'username',
+            label: 'Tên người dùng',
+            hideCondition: !isEmpty(user),
+        },
+        {
+            component: 'text-field' as 'text-field',
+            attribute: 'password',
+            label: 'Mật khẩu',
+            props: {
+                type: 'password',
+            },
+            hideCondition: !isEmpty(user),
+        },
+        {
+            component: 'text-field' as 'text-field',
+            attribute: 'name',
+            label: 'Họ và tên',
+        },
+        {
+            component: 'text-field' as 'text-field',
+            attribute: 'phone',
+            label: 'Số điện thoại',
+        },
+    ];
+
+    const methods = useForm({
+        mode: 'onTouched',
+        resolver: yupResolver(schema),
+    });
+
+    useEffect(() => {
+        methods.reset(user);
+    }, [user]);
 
     useEffect(() => {
         if (
@@ -53,110 +102,57 @@ const UserEditView = () => {
         ) {
             navigate('/user/list', { replace: true });
         }
-    }, [state]);
+    }, [state, updateState]);
 
-    function fields(): Array<FieldProp> {
-        return [
-            {
-                component: 'text-field',
-                attribute: 'username',
-                label: 'Tên người dùng',
-                props: {
-                    fullWidth: true,
-                    autoComplete: 'username',
-                },
-                validationType: 'string',
-                validations: [['required', true]],
-                hideCondition: !isEmpty(id),
-            },
-            {
-                component: 'text-field',
-                attribute: 'password',
-                label: 'Mật khẩu',
-                props: {
-                    fullWidth: true,
-                    autoComplete: 'current-password',
-                    type: 'password',
-                },
-                validationType: 'string',
-                validations: [['required', true]],
-                hideCondition: !isEmpty(id),
-            },
-            {
-                component: 'text-field',
-                attribute: 'name',
-                label: 'Họ và tên',
-                props: {
-                    fullWidth: true,
-                },
-                validationType: 'string',
-                validations: [['required', true]],
-            },
-            {
-                component: 'text-field',
-                attribute: 'phone',
-                label: 'Số điện thoại',
-                props: {
-                    fullWidth: true,
-                },
-                validationType: 'string',
-            },
-        ];
-    }
-
-    const schema = validationUtils.getFormSchema(fields());
-
-    const methods = useForm<IUser>({
-        mode: 'onTouched',
-        resolver: yupResolver(schema),
-    });
     return (
-        <Grid item xs={12}>
-            <BoxUser>
-                <Box mb={4}>
-                    <Link
-                        component={RouterLink}
-                        to="/user/list"
-                        underline="hover"
-                        color="inherit"
+        <>
+            {state?.value && <RequestAlert {...state.value} />}
+            {updateState?.value && <RequestAlert {...updateState.value} />}
+            <Grid item xs={12}>
+                <BoxUser>
+                    <Box mb={4}>
+                        <Link
+                            component={RouterLink}
+                            to="/user/list"
+                            underline="hover"
+                            color="inherit"
+                        >
+                            <ArrowBackIcon />
+                            <Typography ml={2}>Người dùng</Typography>
+                        </Link>
+                    </Box>
+                    {!isEmpty(user) && <UserInfo {...user} />}
+                    <Paper
+                        sx={{
+                            p: 2,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            mt: 4,
+                        }}
+                        component={Card}
                     >
-                        <ArrowBackIcon />
-                        <Typography ml={2}>Người dùng</Typography>
-                    </Link>
-                </Box>
-                {!isEmpty(user) && <UserInfo {...user} />}
-                <Paper
-                    sx={{
-                        p: 2,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        mt: 4,
-                    }}
-                    component={Card}
-                >
-                    <CardHeader
-                        title={
-                            <Typography variant="h6">
-                                {id
-                                    ? 'Chỉnh sửa người dùng'
-                                    : 'Thêm người dùng'}
-                            </Typography>
-                        }
-                        sx={{ px: 0 }}
-                    />
-                    <Divider />
-                    <Grid container xs={12} md={8} spacing={4}>
-                        <Grid item xs={12} md={8}>
-                            <Box
-                                component="form"
-                                onSubmit={methods.handleSubmit(handleSubmit)}
-                                sx={{ my: 4 }}
-                            >
-                                <FormBuilder
-                                    fields={fields()}
-                                    methods={methods}
-                                    defaultValue={{ ...user }}
+                        <CardHeader
+                            title={
+                                <Typography variant="h6">
+                                    {id
+                                        ? 'Chỉnh sửa người dùng'
+                                        : 'Thêm người dùng'}
+                                </Typography>
+                            }
+                            sx={{ px: 0 }}
+                        />
+                        <Divider />
+                        <Grid container spacing={4}>
+                            <Grid item xs={12} md={8}>
+                                <Box
+                                    component="form"
+                                    sx={{ my: 4 }}
+                                    onSubmit={methods.handleSubmit(onSubmit)}
                                 >
+                                    <FormBuilder
+                                        fields={fields}
+                                        methods={methods}
+                                    />
                                     <LoadingButton
                                         type="submit"
                                         variant="contained"
@@ -165,13 +161,13 @@ const UserEditView = () => {
                                     >
                                         {id ? 'Chỉnh sửa' : 'Tạo mới'}
                                     </LoadingButton>
-                                </FormBuilder>
-                            </Box>
+                                </Box>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Paper>
-            </BoxUser>
-        </Grid>
+                    </Paper>
+                </BoxUser>
+            </Grid>
+        </>
     );
 };
 

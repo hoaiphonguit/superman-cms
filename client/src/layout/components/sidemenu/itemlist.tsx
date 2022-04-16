@@ -1,8 +1,6 @@
 import { memo } from 'react';
-import ListSubheader from '@mui/material/ListSubheader';
-import List from '@mui/material/List';
-import { INavigator } from 'src/interfaces/app';
-import { styled } from '@mui/material/styles';
+import {List, ListSubheader, styled} from '@mui/material';
+import { INavigator } from 'src/interfaces';
 import NavItem from './navitem';
 
 const SuperNav = styled(List)<{ component?: React.ElementType }>({

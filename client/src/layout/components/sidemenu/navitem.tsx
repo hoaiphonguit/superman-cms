@@ -1,15 +1,16 @@
 import { Fragment, memo } from 'react';
-import { INavigator } from 'src/interfaces/app';
-import Icon from '@mui/material/Icon';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { INavigator } from 'src/interfaces';
 import { useToggle } from 'react-use';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import Collapse from '@mui/material/Collapse';
-import List from '@mui/material/List';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
+import {
+    Collapse,
+    Icon,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+} from '@mui/material';
 
 const NavItem = ({ icon, children, name, url }: INavigator) => {
     const [open, setOpen] = useToggle(false);

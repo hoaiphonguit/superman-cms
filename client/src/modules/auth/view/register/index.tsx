@@ -1,24 +1,12 @@
 import { memo, useEffect } from 'react';
-import Avatar from '@mui/material/Avatar';
-import CssBaseline from '@mui/material/CssBaseline';
-import Link from '@mui/material/Link';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Footer from 'src/layout/components/footer';
-import { yupResolver } from '@hookform/resolvers/yup';
-import {
-    FieldProp,
-    FormBuilder,
-    validationUtils,
-} from '@jeremyling/react-material-ui-form-builder';
+import { Footer } from 'src/layout/components';
 import { useForm } from 'react-hook-form';
 import { useAsyncFn } from 'react-use';
-import AuthService from '../../service';
+import { AuthService } from 'src/modules/auth';
+import { Avatar, Box, CssBaseline, Grid, Link, Paper, Typography } from '@mui/material';
 import { IUser } from 'src/interfaces';
 import { LoadingButton } from '@mui/lab';
-import Alert from 'src/components/alert';
+import { RequestAlert } from 'src/components';
 import { useNavigate } from 'react-router-dom';
 
 const RegisterView = () => {
@@ -34,54 +22,9 @@ const RegisterView = () => {
         }
     }, [state]);
 
-    function fields(): Array<FieldProp> {
-        return [
-            {
-                component: 'text-field',
-                attribute: 'username',
-                label: 'Username',
-                props: {
-                    fullWidth: true,
-                    autoComplete: 'username',
-                },
-                validationType: 'string',
-                validations: [['required', true]],
-            },
-            {
-                component: 'text-field',
-                attribute: 'password',
-                label: 'Password',
-                props: {
-                    fullWidth: true,
-                    autoComplete: 'current-password',
-                    type: 'password',
-                },
-                validationType: 'string',
-                validations: [['required', true]],
-            },
-            {
-                component: 'text-field',
-                attribute: 'name',
-                label: 'Full name',
-                props: {
-                    fullWidth: true,
-                },
-                validationType: 'string',
-                validations: [['required', true]],
-            },
-        ];
-    }
-
-    const schema = validationUtils.getFormSchema(fields());
-
-    const methods = useForm<IUser>({
-        mode: 'onTouched',
-        resolver: yupResolver(schema),
-    });
-
     return (
         <>
-            {state?.value && <Alert {...state.value} />}
+            {state?.value && <RequestAlert {...state.value} />}
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
                 <Grid
@@ -122,12 +65,8 @@ const RegisterView = () => {
                         <Typography component="h1" variant="h5">
                             Register
                         </Typography>
-                        <Box
-                            component="form"
-                            onSubmit={methods.handleSubmit(handleSubmit)}
-                            sx={{ mt: 1 }}
-                        >
-                            <FormBuilder
+                        <Box component="form" sx={{ mt: 1 }}>
+                            {/* <FormBuilder
                                 fields={fields()}
                                 methods={methods}
                                 defaultValue={null}
@@ -141,7 +80,7 @@ const RegisterView = () => {
                                 >
                                     Register
                                 </LoadingButton>
-                            </FormBuilder>
+                            </FormBuilder> */}
                             <Grid container sx={{ mt: 1 }}>
                                 <Grid item xs>
                                     <Link

@@ -1,12 +1,10 @@
 import { memo } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import ProtectedRoute from 'src/components/ProtectedRoute';
-import LoginView from 'src/modules/auth/view/login';
-import RegisterView from 'src/modules/auth/view/register';
-import HomeView from 'src/modules/dashboard/view/home';
-import UserListView from 'src/modules/user/view/userlist';
-import UserEditView from 'src/modules/user/view/useredit';
-import NavigationListView from 'src/modules/app/view/navigationList';
+import { ProtectedRoute } from 'src/components';
+import { LoginView, RegisterView } from 'src/modules/auth';
+import { HomeView } from 'src/modules/dashboard';
+import { UserListView, UserEditView } from 'src/modules/user';
+import { NavigationListView } from 'src/modules/app';
 
 export const AppRoutes = () => {
     return (

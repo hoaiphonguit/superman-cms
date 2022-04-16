@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
-import Spinner from './components/spinner';
+import { Spinner } from './components';
 import { IAuth, IUser } from './interfaces';
 import Layout from 'src/layout';
-import AuthService from './modules/auth/service';
-import LoginView from './modules/auth/view/login';
-import { setAuth } from './redux/actions/auth';
-import { authSelector } from './redux/selectors/auth';
+import { AuthService } from './modules/auth';
+import { setAuth } from './redux/actions';
+import { authSelector } from './redux/selectors';
 import AppRoutes from './routes';
 
 const App = () => {
@@ -16,14 +15,14 @@ const App = () => {
     const authState = useSelector(authSelector);
 
     useEffect(() => {
-        let authState: IAuth = {
-            loading: false,
+        let auth: IAuth = {
+            loading: true,
             isAuthenticated: false,
             user: {} as IUser,
         };
         if (state.value?.message) {
             if (state.value?.success) {
-                authState = {
+                auth = {
                     loading: false,
                     isAuthenticated: true,
                     user: state.value.user,
@@ -31,7 +30,7 @@ const App = () => {
             }
         }
 
-        dispatch(setAuth(authState));
+        dispatch(setAuth(auth));
     }, [state]);
 
     if (state.loading || authState.loading) {
@@ -39,7 +38,7 @@ const App = () => {
     }
 
     if (!authState.isAuthenticated) {
-        return <LoginView />;
+        return <AppRoutes />;
     }
 
     return (
