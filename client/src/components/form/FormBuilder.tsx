@@ -1,11 +1,14 @@
 import { Box, Grid } from '@mui/material';
-import { Fragment, memo, useEffect } from 'react';
-import { UseFormProps, UseFormReturn } from 'react-hook-form';
-import { GridColMap } from 'src/interfaces';
+import { memo, useEffect } from 'react';
+import { UseFormReturn } from 'react-hook-form';
+import { IFormBuilderProps, TFieldProp } from 'src/interfaces';
+import { sanitizeColProps } from 'src/utils';
 import StandardTextField from './components/StandardTextField';
-import { TFieldProp } from './interface';
 
-function getFormComponent(field: TFieldProp, methods: UseFormReturn<any>) {
+export function getFormComponent(
+    field: TFieldProp,
+    methods: UseFormReturn<any>
+) {
     switch (field.component) {
         case 'text-field':
         default:
@@ -13,25 +16,19 @@ function getFormComponent(field: TFieldProp, methods: UseFormReturn<any>) {
     }
 }
 
-export interface IFormBuilderProps<TForm> {
-    fields: Array<TFieldProp>;
-    defaultValue?: UseFormProps<TForm>['defaultValues'];
-    methods: UseFormReturn<any>;
-}
-
-function sanitizeColProps(col?: GridColMap): GridColMap {
-    col = col || {};
-    return {
-        xs: col.xs || 12,
-        sm: col.sm,
-        md: col.md,
-        lg: col.lg,
-        xl: col.xl,
-    };
-}
-
 function FormBuilder<TForm>(props: IFormBuilderProps<TForm>) {
-    const { fields, defaultValue, methods } = props;
+    const { fields, methods, errors, children } = props;
+
+    useEffect(() => {
+        if (errors) {
+            for (const error of errors) {
+                methods.setError(error.attribute, {
+                    type: error.type,
+                    message: error.message,
+                });
+            }
+        }
+    }, [errors]);
 
     return (
         <Box>
@@ -50,6 +47,7 @@ function FormBuilder<TForm>(props: IFormBuilderProps<TForm>) {
                     );
                 })}
             </Grid>
+            {children}
         </Box>
     );
 }

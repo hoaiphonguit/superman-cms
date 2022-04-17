@@ -1,5 +1,5 @@
 import { memo, useEffect } from 'react';
-import { IUser } from 'src/interfaces';
+import { IUser, TFieldProp } from 'src/interfaces';
 import { useAsyncFn } from 'react-use';
 import {
     Box,
@@ -20,22 +20,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import UserInfo from './userinfo';
 import { Link as RouterLink } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { RequestAlert } from 'src/components';
-import { isEmpty, method } from 'lodash';
-import { TFieldProp } from 'src/components/form/interface';
-import FormBuilder from 'src/components/form/FormBuilder';
-import * as yup from 'yup';
+import { RequestAlert, FormBuilder } from 'src/components';
+import { isEmpty } from 'lodash';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { getFormSchema } from 'src/utils';
 
 const BoxUser = styled(Box)<{ component?: React.ElementType }>({
     '& .MuiLink-root': {
         display: 'flex',
     },
-});
-
-const schema = yup.object({
-    name: yup.string().required(),
-    phone: yup.string().required(),
 });
 
 const UserEditView = () => {
@@ -54,7 +47,6 @@ const UserEditView = () => {
     const user: IUser = userState.value?.user || {};
 
     const onSubmit = (data: any) => {
-        console.log('data', data);
         id ? updateFn(id, data) : registerFn(data);
     };
 
@@ -63,7 +55,12 @@ const UserEditView = () => {
             component: 'text-field' as 'text-field',
             attribute: 'username',
             label: 'Tên người dùng',
+            props: {
+                placeholder: 'Nhập tên người dùng để đăng nhập',
+            },
             hideCondition: !isEmpty(user),
+            validationType: 'string',
+            validations: [['required', true]],
         },
         {
             component: 'text-field' as 'text-field',
@@ -71,20 +68,33 @@ const UserEditView = () => {
             label: 'Mật khẩu',
             props: {
                 type: 'password',
+                placeholder: 'Nhập mật khẩu',
             },
             hideCondition: !isEmpty(user),
+            validationType: 'string',
+            validations: [['required', true]],
         },
         {
             component: 'text-field' as 'text-field',
             attribute: 'name',
             label: 'Họ và tên',
+            validationType: 'string',
+            validations: [['required', true]],
+            props: {
+                placeholder: 'Nhập họ và tên',
+            },
         },
         {
-            component: 'text-field' as 'text-field',
+            component: 'text-field',
             attribute: 'phone',
             label: 'Số điện thoại',
+            props: {
+                placeholder: 'Nhập số điện thoại',
+            },
         },
     ];
+
+    const schema = getFormSchema(fields);
 
     const methods = useForm({
         mode: 'onTouched',
@@ -92,13 +102,15 @@ const UserEditView = () => {
     });
 
     useEffect(() => {
-        methods.reset(user);
+        if (!isEmpty(user)) {
+            methods.reset(user);
+        }
     }, [user]);
 
     useEffect(() => {
         if (
-            (state.value && !state.value?.success) ||
-            (updateState.value && !updateState.value?.success)
+            (state.value && state.value?.success) ||
+            (updateState.value && updateState.value?.success)
         ) {
             navigate('/user/list', { replace: true });
         }
@@ -148,6 +160,7 @@ const UserEditView = () => {
                                     component="form"
                                     sx={{ my: 4 }}
                                     onSubmit={methods.handleSubmit(onSubmit)}
+                                    noValidate
                                 >
                                     <FormBuilder
                                         fields={fields}

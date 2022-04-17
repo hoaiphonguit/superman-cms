@@ -1,8 +1,8 @@
-import { FormEvent, FormEventHandler, memo, useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { Footer } from 'src/layout/components';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useAsyncFn } from 'react-use';
-import { IAuth, ILogin, IUser } from 'src/interfaces';
+import { IAuth, TFieldProp } from 'src/interfaces';
 import { LoadingButton } from '@mui/lab';
 import { RequestAlert } from 'src/components';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -22,8 +22,6 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import FormBuilder from 'src/components/form/FormBuilder';
-import { method } from 'lodash';
-import { TFieldProp } from 'src/components/form/interface';
 
 const schema = yup
     .object({
