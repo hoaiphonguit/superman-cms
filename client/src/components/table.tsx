@@ -173,8 +173,11 @@ function SuperTable<T>({
                                                     key={column.id as any}
                                                     align={column.align}
                                                 >
-                                                    {column.format &&
-                                                    typeof value === 'number'
+                                                    {column.render
+                                                        ? column.render(value)
+                                                        : column.format &&
+                                                          typeof value ===
+                                                              'number'
                                                         ? column.format(value)
                                                         : value}
                                                 </TableCell>

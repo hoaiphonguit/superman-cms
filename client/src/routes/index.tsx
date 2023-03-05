@@ -5,6 +5,7 @@ import { LoginView, RegisterView } from 'src/modules/auth';
 import { HomeView } from 'src/modules/dashboard';
 import { UserListView, UserEditView } from 'src/modules/user';
 import { NavigationListView } from 'src/modules/app';
+import { ContentListView } from 'src/modules/content';
 
 export const AppRoutes = () => {
     return (
@@ -26,6 +27,9 @@ export const AppRoutes = () => {
                     path="/navigation/list"
                     element={<NavigationListView />}
                 />
+            </Route>
+            <Route path="/post/all-list" element={<ProtectedRoute />}>
+                <Route path="/post/all-list" element={<ContentListView />} />
             </Route>
             <Route caseSensitive path="/login" element={<LoginView />} />
             <Route caseSensitive path="/register" element={<RegisterView />} />

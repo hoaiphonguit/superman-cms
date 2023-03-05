@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { API_URL, LOCAL_STORAGE_TOKEN_NAME } from 'src/constants';
+import { INavigator, IResponseList } from 'src/interfaces';
 import { setAuthToken } from 'src/utils/request';
 
 export const AppService = {
-    appConfig: async () => {
+    appConfig: async (): Promise<IResponseList<INavigator> | undefined> => {
         if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
             setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
             try {

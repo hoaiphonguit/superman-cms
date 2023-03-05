@@ -12,8 +12,14 @@ import {
     ListItemText,
 } from '@mui/material';
 
-const NavItem = ({ icon, children, name, url }: INavigator) => {
-    const [open, setOpen] = useToggle(false);
+const NavItem = ({
+    icon,
+    children,
+    name,
+    url,
+    defaultExpand = false,
+}: INavigator) => {
+    const [open, setOpen] = useToggle(defaultExpand);
     return !children ? (
         <NavLink to={url || ''}>
             {({ isActive }) => (
