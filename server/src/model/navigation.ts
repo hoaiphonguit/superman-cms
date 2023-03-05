@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import * as mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const NavigationItem = new Schema({
@@ -22,4 +22,4 @@ const NavigationSchema = new Schema({
     children: [NavigationItem],
 });
 
-module.exports = mongoose.model('navigations', NavigationSchema);
+export default mongoose.model('navigations', NavigationSchema);

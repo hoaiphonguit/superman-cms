@@ -1,10 +1,10 @@
-const express = require('express');
+import * as argon2 from 'argon2';
+import * as express from 'express';
+import * as jwt from 'jsonwebtoken';
+import { verifyToken } from '../middleware/auth';
+import User from '../model/user';
+
 const router = express.Router();
-const User = require('../model/user');
-const argon2 = require('argon2');
-const jwt = require('jsonwebtoken');
-const { verifyToken } = require('../middleware/auth');
-require('dotenv').config({ path: './.env' });
 
 /**
  * @route POST /api/auth/register
@@ -120,8 +120,10 @@ router.post('/login', async (req, res) => {
  */
 router.get('/', verifyToken, async (req, res) => {
     try {
-        const userUpdateCondition = { _id: req.userId, deleted: 0 };
-        const updateUser = { lastActivity: new Date().getTime() };
+        const userUpdateCondition = { _id: req['userId'], deleted: false };
+        const updateUser = { lastModified: new Date().getTime() };
+
+        console.log(userUpdateCondition, updateUser);
         const user = await User.findOneAndUpdate(
             userUpdateCondition,
             updateUser,
@@ -148,4 +150,4 @@ router.get('/', verifyToken, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

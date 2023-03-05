@@ -1,7 +1,8 @@
 import { Avatar, Box, Chip, Typography } from '@mui/material';
-import { memo } from 'react';
 import { styled } from '@mui/material/styles';
+import { memo } from 'react';
 import { IUser } from 'src/interfaces';
+import { stringToColor } from 'src/utils/string';
 
 const BoxInfo = styled(Box)<{ component?: React.ElementType }>({
     display: 'flex',
@@ -10,13 +11,13 @@ const BoxInfo = styled(Box)<{ component?: React.ElementType }>({
     },
 });
 
-const UserInfo = ({ username, name = '' }: IUser) => {
+const UserInfo = ({ username, name = '', avatar }: IUser) => {
     return (
         <BoxInfo>
             <Avatar
                 alt={name}
-                src={''}
-                sx={{ width: 64, height: 64 }}
+                src={avatar || '/'}
+                sx={{ width: 64, height: 64, bgColor: stringToColor(name) }}
             />
             <div>
                 <Typography variant="h5">{name}</Typography>

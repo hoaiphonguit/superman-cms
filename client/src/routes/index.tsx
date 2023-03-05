@@ -1,11 +1,11 @@
 import { memo } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from 'src/components';
-import { LoginView, RegisterView } from 'src/modules/auth';
-import { HomeView } from 'src/modules/dashboard';
-import { UserListView, UserEditView } from 'src/modules/user';
 import { NavigationListView } from 'src/modules/app';
-import { ContentListView } from 'src/modules/content';
+import { LoginView, RegisterView } from 'src/modules/auth';
+import { ContentEditView, ContentListView } from 'src/modules/content';
+import { HomeView } from 'src/modules/dashboard';
+import { UserEditView, UserListView } from 'src/modules/user';
 
 export const AppRoutes = () => {
     return (
@@ -27,6 +27,12 @@ export const AppRoutes = () => {
                     path="/navigation/list"
                     element={<NavigationListView />}
                 />
+            </Route>
+            <Route path="/post/add" element={<ProtectedRoute />}>
+                <Route path="/post/add" element={<ContentEditView />} />
+            </Route>
+            <Route path="/post/edit/:id" element={<ProtectedRoute />}>
+                <Route path="/post/edit/:id" element={<ContentEditView />} />
             </Route>
             <Route path="/post/all-list" element={<ProtectedRoute />}>
                 <Route path="/post/all-list" element={<ContentListView />} />

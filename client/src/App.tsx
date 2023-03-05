@@ -27,6 +27,12 @@ const App = () => {
                     isAuthenticated: true,
                     user: state.value.user,
                 };
+            } else {
+                auth = {
+                    loading: false,
+                    isAuthenticated: false,
+                    user: {} as IUser,
+                };
             }
         }
 

@@ -1,7 +1,8 @@
-const express = require('express');
-const { verifyToken } = require('../middleware/auth');
+import * as express from 'express';
+import { verifyToken } from '../middleware/auth';
+import User from '../model/user';
+
 const router = express.Router();
-const User = require('../model/user');
 
 /**
  * @route GET /api/user/list
@@ -42,7 +43,7 @@ router.put('/:id', verifyToken, async (req, res) => {
         });
     }
     try {
-        const updateUser = {
+        let updateUser = {
             name,
             phone,
             baned,
@@ -50,14 +51,14 @@ router.put('/:id', verifyToken, async (req, res) => {
 
         const userUpdateCondition = { _id: req.params.id, username };
 
-        updatedUser = await User.findOneAndUpdate(
+        updateUser = await User.findOneAndUpdate(
             userUpdateCondition,
             updateUser,
             { new: true }
         );
 
         // User not authorised to update post or post not found
-        if (!updatedUser) {
+        if (!updateUser) {
             return res.status(401).json({
                 success: false,
                 message: 'User not found',
@@ -85,7 +86,7 @@ router.put('/:id', verifyToken, async (req, res) => {
 router.delete('/:id', verifyToken, async (req, res) => {
     try {
         const userUpdateCondition = { _id: req.params.id };
-        const updateUser = { deleted: 1 };
+        const updateUser = { deleted: true };
         const updatedUser = await User.findOneAndUpdate(
             userUpdateCondition,
             updateUser,
@@ -141,4 +142,4 @@ router.get('/:id', verifyToken, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

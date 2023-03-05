@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import * as mongoose from 'mongoose';
+import { CommonSchema } from '../constant/CommonSchema';
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -18,22 +19,11 @@ const UserSchema = new Schema({
     phone: {
         type: String,
     },
-    createdAt: {
-        type: Number,
-        default: new Date().getTime(),
-    },
-    deleted: {
-        type: Number,
-        default: 0,
-    },
-    lastActivity: {
-        type: Number,
-        default: 0,
-    },
     baned: {
-        type: Number,
-        default: 0,
+        type: Boolean,
+        default: false,
     },
+    ...CommonSchema,
 });
 
-module.exports = mongoose.model('users', UserSchema);
+export default mongoose.model('users', UserSchema);

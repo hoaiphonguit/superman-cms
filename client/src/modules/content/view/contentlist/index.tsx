@@ -1,91 +1,49 @@
-import { memo, useEffect, useState } from 'react';
-import { useAsyncFn } from 'react-use';
-import { UserService } from 'src/modules/user';
-import { IUser, IColumn } from 'src/interfaces';
 import AddIcon from '@mui/icons-material/Add';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { ConfirmDialog, SuperTable } from 'src/components';
-import dayjs from 'dayjs';
 import { Button, Grid, Toolbar, Typography } from '@mui/material';
-import ContentService from '../../service';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useAsyncFn } from 'react-use';
+import { ConfirmDialog, SuperTable } from 'src/components';
 import { IPost } from 'src/interfaces/post';
-
-const columns: IColumn<IPost>[] = [
-    { id: 'title', label: 'Tiêu đề' },
-    { id: 'description', label: 'Mô tả ngắn' },
-    { id: 'status', label: 'Trạng thái', format: (status) => 'Đang học' },
-    {
-        id: 'author',
-        label: 'Tác giả',
-        render: (author) => <div>{author.name}</div>
-    },
-];
+import ContentService from '../../service';
+import { actions, columns } from './config';
 
 const ContentListView = () => {
     const [state, stateFn] = useAsyncFn(ContentService.getList);
     const list = state.value?.list || [];
+    const [openDelete, setOpenDelete] = useState(false);
+    const [currPost, setCurrPost] = useState<IPost>();
     const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-    const [currUser, setCurrUser] = useState<IUser>();
 
     useEffect(() => {
         stateFn();
     }, []);
 
-    const handleClickOpen = (user: IUser) => {
-        setOpen(true);
-        setCurrUser(user);
+    const handleDeletePost = (post: IPost) => {
+        setOpenDelete(true);
+        setCurrPost(post);
     };
 
-    const onDeleteUser = async () => {
-        if (currUser) {
-            const resp = await UserService.delete(currUser._id);
+    const handelEditPost = (post: IPost) => {
+        navigate(`/post/edit/${post._id}`, { replace: true });
+    };
+
+    const onDeletePost = async () => {
+        if (currPost) {
+            const resp = await ContentService.delete(currPost._id);
             if (resp.success) {
-                setOpen(false);
-                setCurrUser(undefined);
+                setOpenDelete(false);
+                setCurrPost(undefined);
                 stateFn();
             }
         }
     };
 
-    const onBanUser = async (user: IUser) => {
-        if (user) {
-            const resp = await UserService.update(user._id, {
-                ...user,
-                baned: !!user.baned ? 0 : 1,
-            });
-            if (resp.success) {
-                stateFn();
-            }
-        }
-    };
+    const actionsConfig = useMemo(
+        () => actions(handelEditPost, handleDeletePost),
+        []
+    );
 
-    // const actions = {
-    //     label: 'Thao tác',
-    //     width: 140,
-    //     actions: [
-    //         {
-    //             icon: 'drive_file_rename_outline',
-    //             onClick: (user: IUser) => {
-    //                 navigate(`/user/edit/${user._id}`, { replace: true });
-    //             },
-    //         },
-    //         {
-    //             icon: 'delete_outline',
-    //             color: 'error' as 'error',
-    //             onClick: (user: IUser) => {
-    //                 handleClickOpen(user);
-    //             },
-    //         },
-    //         {
-    //             icon: (user: IUser) =>
-    //                 !!user.baned ? 'remove_moderator' : 'shield',
-    //             onClick: (user: IUser) => {
-    //                 onBanUser(user);
-    //             },
-    //         },
-    //     ],
-    // };
     return (
         <Grid item xs={12}>
             <Toolbar disableGutters={true}>
@@ -103,6 +61,7 @@ const ContentListView = () => {
                     startIcon={<AddIcon />}
                     component={RouterLink}
                     to="/user/add"
+                    size="large"
                 >
                     Thêm
                 </Button>
@@ -110,14 +69,14 @@ const ContentListView = () => {
             <SuperTable
                 data={list}
                 columns={columns}
-                // actions={actions}
+                actions={actionsConfig}
                 hasIndex
             />
             <ConfirmDialog
-                open={open}
-                setOpen={setOpen}
-                title="Bạn có chắc chắn muốn xóa người dùng này?"
-                onOk={onDeleteUser}
+                open={openDelete}
+                setOpen={setOpenDelete}
+                title="Bạn có chắc chắn muốn xóa bài viết này?"
+                onOk={onDeletePost}
             />
         </Grid>
     );

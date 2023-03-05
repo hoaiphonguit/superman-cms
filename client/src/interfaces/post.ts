@@ -1,16 +1,22 @@
 import { IUser } from './auth';
 
 export enum EPostStatus {
-    TO_LEARN,
-    LEARNING,
-    FINISH,
+    'DRAFT', // Đang biên tập
+    'SUBMITTED', // Đã gửi
+    'SUBMITTED_RETURN', // Yêu cầu biên tập lại,
+    'APPROVED', // Đã duyệt
+    'PUBLISHED', // Đã đăng,
+    'DISCONTINUTED',
 }
 
 export interface IPost {
     _id: string;
     title: string;
+    thumbnail: string;
     description: string;
     url: string;
     status: EPostStatus;
     author: IUser;
+    createdAt: number;
+    publishDate: number;
 }

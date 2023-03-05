@@ -1,5 +1,3 @@
-import { memo, useState } from 'react';
-import { ITable } from 'src/interfaces/table';
 import {
     Icon,
     IconButton,
@@ -7,12 +5,35 @@ import {
     Table,
     TableBody,
     TableCell,
+    tableCellClasses,
     TableContainer,
     TableHead,
     TablePagination,
     TableRow,
     TableSortLabel,
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { memo, useState } from 'react';
+import { ITable } from 'src/interfaces/table';
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        textTransform: 'uppercase',
+        fontSize: 12,
+        fontWeight: 'bold',
+        padding: 10,
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+        padding: 16,
+    },
+}));
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    // hide last border
+    '&:last-child td, &:last-child th': {
+        border: 0,
+    },
+}));
 
 function SuperTable<T>({
     columns,
@@ -86,18 +107,21 @@ function SuperTable<T>({
                                 />
                             </TableCell> */}
                             {hasIndex && (
-                                <TableCell
+                                <StyledTableCell
                                     align={'center'}
-                                    style={{ width: 110 }}
+                                    style={{ width: 80, textAlign: 'center' }}
                                 >
-                                    <TableSortLabel>Thứ tự</TableSortLabel>
-                                </TableCell>
+                                    Thứ tự
+                                </StyledTableCell>
                             )}
                             {columns.map((column) => (
-                                <TableCell
+                                <StyledTableCell
                                     key={column.id as any}
                                     align={column.align}
-                                    style={{ minWidth: column.minWidth }}
+                                    style={{
+                                        minWidth: column.minWidth,
+                                        width: column.width,
+                                    }}
                                     // sortDirection={
                                     //     orderBy === column.id ? order : false
                                     // }
@@ -123,17 +147,18 @@ function SuperTable<T>({
                                             </Box>
                                         ) : null} */}
                                     </TableSortLabel>
-                                </TableCell>
+                                </StyledTableCell>
                             ))}
                             {actions && (
-                                <TableCell
+                                <StyledTableCell
                                     align={'center'}
-                                    style={{ width: actions.width || 120 }}
+                                    style={{
+                                        width: actions.width || 120,
+                                        textAlign: actions.align || 'left',
+                                    }}
                                 >
-                                    <TableSortLabel>
-                                        {actions.label}
-                                    </TableSortLabel>
-                                </TableCell>
+                                    {actions.label}
+                                </StyledTableCell>
                             )}
                         </TableRow>
                     </TableHead>
@@ -147,7 +172,7 @@ function SuperTable<T>({
                                 const isItemSelected = isSelected(index);
                                 const labelId = `enhanced-table-checkbox-${index}`;
                                 return (
-                                    <TableRow
+                                    <StyledTableRow
                                         hover
                                         role="checkbox"
                                         // selected={isItemSelected}
@@ -164,29 +189,39 @@ function SuperTable<T>({
                                             />
                                         </TableCell> */}
                                         {hasIndex && (
-                                            <TableCell>{index + 1}</TableCell>
+                                            <StyledTableCell
+                                                style={{ textAlign: 'center' }}
+                                            >
+                                                {index + 1}
+                                            </StyledTableCell>
                                         )}
                                         {columns.map((column) => {
                                             const value = row[column.id];
                                             return (
-                                                <TableCell
+                                                <StyledTableCell
                                                     key={column.id as any}
                                                     align={column.align}
                                                 >
                                                     {column.render
-                                                        ? column.render(value)
+                                                        ? column.render(
+                                                              row,
+                                                              value,
+                                                              index
+                                                          )
                                                         : column.format &&
                                                           typeof value ===
                                                               'number'
                                                         ? column.format(value)
                                                         : value}
-                                                </TableCell>
+                                                </StyledTableCell>
                                             );
                                         })}
                                         {actions && (
-                                            <TableCell
+                                            <StyledTableCell
                                                 style={{
                                                     width: actions.width || 120,
+                                                    textAlign:
+                                                        actions.align || 'left',
                                                 }}
                                             >
                                                 {actions.actions.map(
@@ -218,9 +253,9 @@ function SuperTable<T>({
                                                         </IconButton>
                                                     )
                                                 )}
-                                            </TableCell>
+                                            </StyledTableCell>
                                         )}
-                                    </TableRow>
+                                    </StyledTableRow>
                                 );
                             })}
                     </TableBody>

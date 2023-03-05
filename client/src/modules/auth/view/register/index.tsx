@@ -1,18 +1,59 @@
-import { memo, useEffect } from 'react';
-import { Footer } from 'src/layout/components';
-import { useForm } from 'react-hook-form';
-import { useAsyncFn } from 'react-use';
-import { AuthService } from 'src/modules/auth';
-import { Avatar, Box, CssBaseline, Grid, Link, Paper, Typography } from '@mui/material';
-import { IUser } from 'src/interfaces';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { RequestAlert } from 'src/components';
+import {
+    Avatar,
+    Box,
+    CssBaseline,
+    Grid,
+    Link,
+    Paper,
+    Typography
+} from '@mui/material';
+import { memo, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useAsyncFn } from 'react-use';
+import { FormBuilder, RequestAlert } from 'src/components';
+import { TFieldProp } from 'src/interfaces';
+import { Footer } from 'src/layout/components';
+import { AuthService } from 'src/modules/auth';
+import * as yup from 'yup';
+
+const schema = yup
+    .object({
+        username: yup.string().required(),
+        password: yup.string().required(),
+    })
+    .required();
+
+const fields: Array<TFieldProp> = [
+    {
+        component: 'text-field' as 'text-field',
+        attribute: 'username',
+        label: 'Tên người dùng',
+    },
+    {
+        component: 'text-field' as 'text-field',
+        attribute: 'password',
+        label: 'Mật khẩu',
+        props: {
+            type: 'password',
+        },
+    },
+    {
+        component: 'text-field' as 'text-field',
+        attribute: 'name',
+        label: 'Họ và tên',
+        props: {
+            type: 'name',
+        },
+    },
+];
 
 const RegisterView = () => {
     const [state, registerFn] = useAsyncFn(AuthService.registerUser);
     const navigate = useNavigate();
-    const handleSubmit = (data: IUser) => {
+    const onSubmit = (data: any) => {
         registerFn(data);
     };
 
@@ -21,6 +62,15 @@ const RegisterView = () => {
             navigate('/login', { replace: true });
         }
     }, [state]);
+
+    const methods = useForm({
+        defaultValues: {
+            username: 'phongvh',
+            password: '',
+        },
+        mode: 'onTouched',
+        resolver: yupResolver(schema),
+    });
 
     return (
         <>
@@ -65,12 +115,12 @@ const RegisterView = () => {
                         <Typography component="h1" variant="h5">
                             Register
                         </Typography>
-                        <Box component="form" sx={{ mt: 1 }}>
-                            {/* <FormBuilder
-                                fields={fields()}
-                                methods={methods}
-                                defaultValue={null}
-                            >
+                        <Box
+                            component="form"
+                            sx={{ mt: 1 }}
+                            onSubmit={methods.handleSubmit(onSubmit)}
+                        >
+                            <FormBuilder fields={fields} methods={methods}>
                                 <LoadingButton
                                     type="submit"
                                     fullWidth
@@ -80,7 +130,7 @@ const RegisterView = () => {
                                 >
                                     Register
                                 </LoadingButton>
-                            </FormBuilder> */}
+                            </FormBuilder>
                             <Grid container sx={{ mt: 1 }}>
                                 <Grid item xs>
                                     <Link

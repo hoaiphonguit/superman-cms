@@ -1,15 +1,5 @@
-import { memo, useEffect } from 'react';
-import { Footer } from 'src/layout/components';
-import { useForm } from 'react-hook-form';
-import { useAsyncFn } from 'react-use';
-import { IAuth, TFieldProp } from 'src/interfaces';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { RequestAlert } from 'src/components';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { setAuth } from 'src/redux/actions';
-import { authSelector } from 'src/redux/selectors';
-import { AuthService } from 'src/modules/auth';
 import {
     Avatar,
     Box,
@@ -19,9 +9,19 @@ import {
     Paper,
     Typography,
 } from '@mui/material';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { memo, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useAsyncFn } from 'react-use';
+import { RequestAlert } from 'src/components';
 import FormBuilder from 'src/components/form/FormBuilder';
+import { IAuth, IUser, TFieldProp } from 'src/interfaces';
+import { Footer } from 'src/layout/components';
+import { AuthService } from 'src/modules/auth';
+import { setAuth } from 'src/redux/actions';
+import { authSelector } from 'src/redux/selectors';
+import * as yup from 'yup';
 
 const schema = yup
     .object({
@@ -68,6 +68,14 @@ const LoginView = () => {
             };
             dispatch(setAuth(auth));
             navigate('/', { replace: true });
+        } else {
+            dispatch(
+                setAuth({
+                    loading: false,
+                    isAuthenticated: false,
+                    user: {} as IUser,
+                })
+            );
         }
     }, [state]);
 

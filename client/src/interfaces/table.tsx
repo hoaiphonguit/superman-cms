@@ -6,9 +6,10 @@ export interface IColumn<T> {
     id: keyof T;
     label: string;
     minWidth?: number;
+    width?: number;
     align?: 'right' | 'left' | 'center';
     format?: (value: number) => string;
-    render?: (value: any) => ReactNode;
+    render?: (row: any, value: any, index: number) => ReactNode;
 }
 
 export interface ITable<T> {
@@ -24,8 +25,9 @@ export interface ITable<T> {
     actions?: {
         label: string;
         width?: number;
+        align?: 'left' | 'center' | 'right',
         actions: {
-            icon: string | ((row: T) => string);
+            icon: string | ((row: T) => string | ReactNode);
             color?: OverridableStringUnion<
                 | 'inherit'
                 | 'default'
@@ -37,7 +39,7 @@ export interface ITable<T> {
                 | 'warning',
                 IconButtonPropsColorOverrides
             >;
-            onClick: any;
+            onClick?: any;
         }[];
     };
 }

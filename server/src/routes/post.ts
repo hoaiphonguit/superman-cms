@@ -1,8 +1,8 @@
-const express = require('express');
-const { verifyToken } = require('../middleware/auth');
+import * as express from 'express';
+import { verifyToken } from '../middleware/auth';
+import Post from '../model/post';
+import { validUrl } from '../utils/string';
 const router = express.Router();
-const Post = require('../model/post');
-const { validUrl } = require('../utils/string');
 
 /**
  * @route POST /api/post/create
@@ -10,24 +10,22 @@ const { validUrl } = require('../utils/string');
  * @access Private
  */
 router.post('/create', verifyToken, async (req, res) => {
-    const { title, description, status, url } = req.body;
+    const { title, description, status, url = '' } = req.body;
 
     if (!title || !description) {
-        return res
-            .status(400)
-            .json({
-                success: false,
-                message: 'Missing Title and/or Description',
-            });
+        return res.status(400).json({
+            success: false,
+            message: 'Missing Title and/or Description',
+        });
     }
 
     try {
         const newPost = new Post({
             title,
             description,
-            status: status || 'TO_LEARN',
+            status: status || 0,
             url: validUrl(url),
-            author: req.userId,
+            author: req['userId'],
         });
 
         await newPost.save();
@@ -53,13 +51,49 @@ router.post('/create', verifyToken, async (req, res) => {
  */
 router.get('/list', verifyToken, async (req, res) => {
     try {
-        const list = await Post.find({ authorId: req.userId }).populate(
-            'author',
-        );
+        const list = await Post.find({
+            authorId: req['userId'],
+            deleted: false,
+        }).populate('author');
 
         return res.json({
             success: true,
             list,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+});
+
+/**
+ * @route GET /api/post/:id
+ * @desc Get post
+ * @access Private
+ */
+router.get('/:id', verifyToken, async (req, res) => {
+    try {
+        const postUpdateCondition = {
+            _id: req.params.id,
+            author: req['userId'],
+        };
+
+        const post = await Post.findOne(postUpdateCondition);
+
+        // User not authorised to update post or post not found
+        if (!post) {
+            return res.status(401).json({
+                success: false,
+                message: 'Post not found or user not authorised',
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            post,
         });
     } catch (error) {
         console.log(error);
@@ -77,27 +111,29 @@ router.get('/list', verifyToken, async (req, res) => {
  */
 router.put('/:id', verifyToken, async (req, res) => {
     const { title, description, status, url } = req.body;
-    if (!title || !description) {
-        return res
-            .status(400)
-            .json({
-                success: false,
-                message: 'Missing Title and/or Description',
-            });
+    if (!title || !description || status == undefined) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing Title and/or Description',
+        });
     }
     try {
-        const updatePost = {
+        let updatePost = {
             title,
             description,
-            status: status || 'TO_LEARN',
+            status: status,
             url: validUrl(url) || '',
+            modifiedDate: new Date().getTime(),
         };
 
-        const postUpdateCondition = { _id: req.params.id, author: req.userId };
+        const postUpdateCondition = {
+            _id: req.params.id,
+            author: req['userId'],
+        };
 
-        updatedPost = await Post.findOneAndUpdate(
+        updatePost = await Post.findOneAndUpdate(
             postUpdateCondition,
-            updatedPost,
+            updatePost,
             { new: true }
         );
 
@@ -109,7 +145,7 @@ router.put('/:id', verifyToken, async (req, res) => {
             });
         }
 
-        return res.status(401).json({
+        return res.status(200).json({
             success: true,
             message: 'Post update successfully',
             post: updatePost,
@@ -130,8 +166,15 @@ router.put('/:id', verifyToken, async (req, res) => {
  */
 router.delete('/:id', verifyToken, async (req, res) => {
     try {
-        const postDeleteCondtion = { _id: req.params.id, user: req.userId };
-        const deletedPost = await Post.findOneAndDelete(postDeleteCondtion);
+        const postDeleteCondtion = {
+            _id: req.params.id,
+            author: req['userId'],
+        };
+        const deletedPost = await Post.findOneAndUpdate(
+            postDeleteCondtion,
+            { deleted: true },
+            { new: true }
+        );
 
         // User not authorised to update post or post not found
         if (!deletedPost) {
@@ -141,7 +184,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
             });
         }
 
-        return res.status(401).json({
+        return res.status(200).json({
             success: true,
             message: 'Post delete successfully',
             post: deletedPost,
@@ -155,4 +198,4 @@ router.delete('/:id', verifyToken, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

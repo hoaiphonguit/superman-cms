@@ -24,6 +24,12 @@ const Layout = ({ children }: { children: any }) => {
     const appTheme = useMemo(
         () =>
             createTheme({
+                typography: {
+                    fontFamily: [
+                        '"Be Vietnam Pro"',
+                        'sans-serif',
+                    ].join(','),
+                },
                 palette: {
                     mode: !mode ? 'light' : 'dark',
                 },

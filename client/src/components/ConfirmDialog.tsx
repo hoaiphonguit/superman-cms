@@ -1,4 +1,3 @@
-import { Dispatch, memo, SetStateAction } from 'react';
 import {
     Button,
     Dialog,
@@ -6,7 +5,21 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    styled,
 } from '@mui/material';
+import { Dispatch, memo, SetStateAction } from 'react';
+
+const StyledComfirmDialog = styled(Dialog)(({ theme }) => ({
+    '& .MuiDialogContent-root': {
+        padding: theme.spacing(3),
+    },
+    '& .MuiDialogTitle-root': {
+        padding: theme.spacing(3),
+    },
+    '& .MuiDialogActions-root': {
+        padding: theme.spacing(3),
+    },
+}));
 
 interface IProps {
     open: boolean;
@@ -33,7 +46,7 @@ const ConfirmDialog = ({
         setOpen(false);
     };
     return (
-        <Dialog
+        <StyledComfirmDialog
             open={open}
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
@@ -48,12 +61,19 @@ const ConfirmDialog = ({
                 </DialogContent>
             )}
             <DialogActions>
-                <Button onClick={onCancel || handleClose}>{cancelText}</Button>
-                <Button onClick={onOk || handleClose} autoFocus>
+                <Button onClick={onCancel || handleClose} variant="outlined">
+                    {cancelText}
+                </Button>
+                <Button
+                    onClick={onOk || handleClose}
+                    autoFocus
+                    variant="contained"
+                    disableElevation
+                >
                     {okText}
                 </Button>
             </DialogActions>
-        </Dialog>
+        </StyledComfirmDialog>
     );
 };
 

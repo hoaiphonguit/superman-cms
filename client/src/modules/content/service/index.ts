@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_URL, LOCAL_STORAGE_TOKEN_NAME } from 'src/constants';
-import { IUser } from 'src/interfaces';
+import { IPost } from 'src/interfaces/post';
 import { setAuthToken } from 'src/utils/request';
 
 export const ContentService = {
@@ -21,11 +21,31 @@ export const ContentService = {
             }
         }
     },
-    update: async (id: string, data: IUser) => {
+    create: async (data: Partial<IPost>) => {
         if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
             setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
             try {
-                const response = await axios.put(`${API_URL}/user/${id}`, data);
+                const response = await axios.post(
+                    `${API_URL}/post/create`,
+                    data
+                );
+                return response.data;
+            } catch (error: any) {
+                if (error.response.data) {
+                    return error.response.data;
+                }
+                return {
+                    success: false,
+                    message: error.message,
+                };
+            }
+        }
+    },
+    update: async (id: string, data: Partial<IPost>) => {
+        if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
+            setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
+            try {
+                const response = await axios.put(`${API_URL}/post/${id}`, data);
                 return response.data;
             } catch (error: any) {
                 if (error.response.data) {
@@ -42,7 +62,7 @@ export const ContentService = {
         if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
             setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
             try {
-                const response = await axios.get(`${API_URL}/user/${id}`);
+                const response = await axios.get(`${API_URL}/post/${id}`);
                 return response.data;
             } catch (error: any) {
                 if (error.response.data) {
@@ -59,7 +79,7 @@ export const ContentService = {
         if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
             setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
             try {
-                const response = await axios.delete(`${API_URL}/user/${id}`);
+                const response = await axios.delete(`${API_URL}/post/${id}`);
                 return response.data;
             } catch (error: any) {
                 if (error.response.data) {

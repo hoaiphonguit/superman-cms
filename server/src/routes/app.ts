@@ -1,8 +1,8 @@
-const express = require('express');
-const { verifyToken } = require('../middleware/auth');
+import * as express from 'express';
+import { verifyToken } from '../middleware/auth';
+import Navigation from '../model/navigation';
+
 const router = express.Router();
-const Navigation = require('../model/navigation');
-const { validUrl } = require('../utils/string');
 
 /**
  * @route GET /api/appConfig
@@ -26,4 +26,4 @@ router.get('/', verifyToken, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;
