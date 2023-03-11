@@ -10,10 +10,11 @@ import {
     Link,
     Paper,
     styled,
-    Typography
+    TextField,
+    Typography,
 } from '@mui/material';
 import { isEmpty } from 'lodash';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { useAsyncFn } from 'react-use';
@@ -22,6 +23,10 @@ import { IPost } from 'src/interfaces/post';
 import { getFormSchema } from 'src/utils';
 import ContentService from '../../service';
 import { fields } from './config';
+import { Editor } from 'react-draft-wysiwyg';
+import { convertToRaw, EditorState } from 'draft-js';
+import draftToHtml from 'draftjs-to-html';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 const BoxUser = styled(Box)<{ component?: React.ElementType }>({
     '& .MuiLink-root': {
@@ -33,6 +38,9 @@ const PostEditView = () => {
     const [createState, cretateFn] = useAsyncFn(ContentService.create);
     const [updateState, updateFn] = useAsyncFn(ContentService.update);
     const [getState, getFn] = useAsyncFn(ContentService.get);
+    const [editorState, setEditorState] = useState(() =>
+        EditorState.createEmpty()
+    );
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -75,6 +83,10 @@ const PostEditView = () => {
             navigate('/post/all-list', { replace: true });
         }
     }, [createState, updateState]);
+
+    const onEditorStateChange = (editorState) => {
+        setEditorState(editorState);
+    };
 
     return (
         <>
@@ -124,6 +136,23 @@ const PostEditView = () => {
                                     <FormBuilder
                                         fields={fieldsConfig}
                                         methods={methods}
+                                    />
+                                    <Editor
+                                        editorState={editorState}
+                                        wrapperClassName="demo-wrapper"
+                                        editorClassName="demo-editor"
+                                        onEditorStateChange={
+                                            onEditorStateChange
+                                        }
+                                    />
+                                    <TextField
+                                        hiddenLabel
+                                        disabled
+                                        value={draftToHtml(
+                                            convertToRaw(
+                                                editorState.getCurrentContent()
+                                            )
+                                        )}
                                     />
                                     <LoadingButton
                                         type="submit"
