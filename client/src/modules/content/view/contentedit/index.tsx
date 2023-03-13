@@ -27,10 +27,19 @@ import { Editor } from 'react-draft-wysiwyg';
 import { convertToRaw, EditorState } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import './style.scss';
 
 const BoxUser = styled(Box)<{ component?: React.ElementType }>({
     '& .MuiLink-root': {
         display: 'flex',
+    },
+});
+
+const StyledPreviewHtmlTextfield = styled(TextField)<{
+    component?: React.ElementType;
+}>({
+    '&.MuiTextField-root': {
+        width: '100%',
     },
 });
 
@@ -139,15 +148,16 @@ const PostEditView = () => {
                                     />
                                     <Editor
                                         editorState={editorState}
-                                        wrapperClassName="demo-wrapper"
-                                        editorClassName="demo-editor"
+                                        wrapperClassName="super-editor-wrapper"
+                                        editorClassName="super-editor"
                                         onEditorStateChange={
                                             onEditorStateChange
                                         }
                                     />
-                                    <TextField
+                                    <StyledPreviewHtmlTextfield
                                         hiddenLabel
                                         disabled
+                                        multiline
                                         value={draftToHtml(
                                             convertToRaw(
                                                 editorState.getCurrentContent()

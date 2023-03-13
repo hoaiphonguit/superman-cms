@@ -1,0 +1,13 @@
+.super-editor-wrapper {
+    margin-top: 24px    ;
+    margin-bottom: 5px;
+    .rdw-editor-toolbar,
+    .super-editor {
+        border: 1px solid rgba(118, 118, 118, 0.3);
+        border-radius: 4px;
+    }
+
+    .super-editor {
+        padding: 0 24px;
+    }
+}
