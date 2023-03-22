@@ -7,6 +7,7 @@ import {
     CardHeader,
     Divider,
     Grid,
+    InputBase,
     Link,
     Paper,
     styled,
@@ -28,6 +29,7 @@ import { convertToRaw, EditorState } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import './style.scss';
+import ImageUpload from './components/ImageUpload';
 
 const BoxUser = styled(Box)<{ component?: React.ElementType }>({
     '& .MuiLink-root': {
@@ -134,14 +136,15 @@ const PostEditView = () => {
                             sx={{ px: 0 }}
                         />
                         <Divider />
-                        <Grid container spacing={4}>
+                        <Grid
+                            container
+                            spacing={4}
+                            component="form"
+                            onSubmit={methods.handleSubmit(onSubmit)}
+                            noValidate
+                        >
                             <Grid item xs={12} md={8}>
-                                <Box
-                                    component="form"
-                                    sx={{ my: 4 }}
-                                    onSubmit={methods.handleSubmit(onSubmit)}
-                                    noValidate
-                                >
+                                <Box sx={{ my: 4 }}>
                                     <FormBuilder
                                         fields={fieldsConfig}
                                         methods={methods}
@@ -176,6 +179,11 @@ const PostEditView = () => {
                                         {id ? 'Chỉnh sửa' : 'Tạo mới'}
                                     </LoadingButton>
                                 </Box>
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                                <Paper sx={{ my: 4, p: 2 }}>
+                                    <ImageUpload />
+                                </Paper>
                             </Grid>
                         </Grid>
                     </Paper>
