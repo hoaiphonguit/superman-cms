@@ -1,50 +1,102 @@
 import * as express from 'express';
+import * as fs from 'fs';
+import * as multer from 'multer';
 import { verifyToken } from '../middleware/auth';
 import Photo from '../model/photo';
-import { validUrl } from '../utils/string';
-import * as multer from 'multer';
+import User from '../model/user';
+import { getImagePath, getImageUrl } from '../utils/url';
 const router = express.Router();
-const upload = multer({ dest: './public/data/uploads/' });
+
+const storage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+        try {
+            const userCondition = {
+                _id: req['userId'],
+                baned: false,
+                deleted: false,
+            };
+            const user = await User.findOne(userCondition);
+            // User not authorised to update post or post not found
+            if (!user) {
+                console.log('User not found or user not authorised');
+                cb(new Error('User not found or user not authorised'), '');
+                return;
+            }
+            const path = `./public/data/uploads/images/${user.username}`;
+            if (!fs.existsSync(path)) {
+                fs.mkdir(path, (err) => {
+                    if (err) {
+                        cb(err, '');
+                        return;
+                    }
+                });
+            }
+            cb(null, path);
+        } catch (error) {
+            console.log(error);
+            cb(new Error('Internal server error'), '');
+        }
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    },
+});
+const upload = multer({ storage: storage }).single('image');
 
 /**
  * @route POST /api/post/create
  * @desc Create post
  * @access Private
  */
-router.post('/images', verifyToken, upload.single('images'), async (req, res) => {
-    const { title, description, status, url = '' } = req.body;
-    console.log(req, req.body);
+router.post('/images', verifyToken, async (req: any, res) => {
+    upload(req, res, async (err) => {
+        const { file } = req;
+        if (err instanceof multer.MulterError) {
+            res.status(500).json({
+                success: false,
+                err: err.code,
+                message: err.message,
+            });
+        } else if (err) {
+            console.log('err', err);
+            res.status(500).json({
+                success: false,
+                message: 'Internal server error',
+            });
+        }
 
-    // if (!title || !description) {
-    //     return res.status(400).json({
-    //         success: false,
-    //         message: 'Missing Title and/or Description',
-    //     });
-    // }
+        if (!file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing file',
+            });
+        }
 
-    // try {
-    //     const newPost = new Post({
-    //         title,
-    //         description,
-    //         status: status || 0,
-    //         url: validUrl(url),
-    //         author: req['userId'],
-    //     });
-
-    //     await newPost.save();
-
-    //     return res.json({
-    //         success: true,
-    //         message: 'Post created successfully',
-    //         post: newPost,
-    //     });
-    // } catch (error) {
-    //     console.log(error);
-    //     res.status(500).json({
-    //         success: false,
-    //         message: 'Internal server error',
-    //     });
-    // }
+        try {
+            const imageObject = {
+                name: file.filename,
+                alt: file.filename,
+                url: getImagePath(file.path),
+                author: req['userId'],
+            };
+            const image = new Photo(imageObject);
+            await image.save();
+            return res.json({
+                success: true,
+                message: 'Image upload successfully',
+                image: {
+                    ...imageObject,
+                    url: getImageUrl(imageObject.url),
+                },
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                success: false,
+                message: 'Internal server error',
+            });
+        }
+    });
 });
 
 /**

@@ -2,6 +2,7 @@ import * as express from 'express';
 import { verifyToken } from '../middleware/auth';
 import Post from '../model/post';
 import { validUrl } from '../utils/string';
+import { getImageUrl } from '../utils/url';
 const router = express.Router();
 
 /**
@@ -76,12 +77,12 @@ router.get('/list', verifyToken, async (req, res) => {
  */
 router.get('/:id', verifyToken, async (req, res) => {
     try {
-        const postUpdateCondition = {
+        const postCondition = {
             _id: req.params.id,
             author: req['userId'],
         };
 
-        const post = await Post.findOne(postUpdateCondition);
+        let post = await Post.findOne(postCondition).lean();
 
         // User not authorised to update post or post not found
         if (!post) {
@@ -90,6 +91,11 @@ router.get('/:id', verifyToken, async (req, res) => {
                 message: 'Post not found or user not authorised',
             });
         }
+
+        post = {
+            ...post,
+            thumbUrl: getImageUrl(post.thumbUrl),
+        };
 
         return res.status(200).json({
             success: true,

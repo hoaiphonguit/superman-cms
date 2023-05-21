@@ -12,7 +12,7 @@ export enum EPostStatus {
 export interface IPost {
     _id: string;
     title: string;
-    thumbnail: string;
+    thumbUrl: string;
     description: string;
     url: string;
     status: EPostStatus;

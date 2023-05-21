@@ -36,7 +36,7 @@ export const renderContentTitle = (post: IPost) => {
             <StyledAvatar
                 variant="rounded"
                 alt={post.title}
-                src={post.thumbnail}
+                src={post.thumbUrl}
             >
                 <PhotoSizeSelectActualOutlinedIcon />
             </StyledAvatar>

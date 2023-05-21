@@ -1,6 +1,6 @@
 import * as cors from 'cors';
 import * as dotenv from 'dotenv';
-dotenv.config({ path: './.env' });
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 import * as express from 'express';
 import { connectToServer } from './src/db/conn';
 import appRouter from './src/routes/app';

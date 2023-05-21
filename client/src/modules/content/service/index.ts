@@ -92,6 +92,34 @@ export const ContentService = {
             }
         }
     },
+    uploadImage: async (image: File) => {
+        if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
+            setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
+            try {
+                const formData = new FormData();
+                formData.append('image', image);
+                const response = await axios.post(
+                    `${API_URL}/upload/images`,
+                    formData,
+                    {
+                        headers: {
+                            'content-type': image.type,
+                            'content-length': `${image.size}`,
+                        },
+                    }
+                );
+                return response.data;
+            } catch (error: any) {
+                if (error.response.data) {
+                    return error.response.data;
+                }
+                return {
+                    success: false,
+                    message: error.message,
+                };
+            }
+        }
+    },
 };
 
 export default ContentService;

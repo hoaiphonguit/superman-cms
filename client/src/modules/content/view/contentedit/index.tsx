@@ -7,15 +7,18 @@ import {
     CardHeader,
     Divider,
     Grid,
-    InputBase,
     Link,
     Paper,
     styled,
     TextField,
     Typography,
 } from '@mui/material';
+import { convertToRaw, EditorState } from 'draft-js';
+import draftToHtml from 'draftjs-to-html';
 import { isEmpty } from 'lodash';
 import { memo, useEffect, useMemo, useState } from 'react';
+import { Editor } from 'react-draft-wysiwyg';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { useForm } from 'react-hook-form';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { useAsyncFn } from 'react-use';
@@ -23,13 +26,9 @@ import { FormBuilder, RequestAlert } from 'src/components';
 import { IPost } from 'src/interfaces/post';
 import { getFormSchema } from 'src/utils';
 import ContentService from '../../service';
-import { fields } from './config';
-import { Editor } from 'react-draft-wysiwyg';
-import { convertToRaw, EditorState } from 'draft-js';
-import draftToHtml from 'draftjs-to-html';
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import './style.scss';
 import ImageUpload from './components/ImageUpload';
+import { fields } from './config';
+import './style.scss';
 
 const BoxUser = styled(Box)<{ component?: React.ElementType }>({
     '& .MuiLink-root': {
@@ -182,7 +181,7 @@ const PostEditView = () => {
                             </Grid>
                             <Grid item xs={12} md={4}>
                                 <Paper sx={{ my: 4, p: 2 }}>
-                                    <ImageUpload />
+                                    <ImageUpload thumbUrl={post.thumbUrl} />
                                 </Paper>
                             </Grid>
                         </Grid>

@@ -5,7 +5,9 @@ import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import Typography, { typographyClasses } from '@mui/material/Typography';
 import { Box } from '@mui/system';
-import { ChangeEvent, memo, useState } from 'react';
+import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
+import ContentService from 'src/modules/content/service';
+import { getImageUrl } from 'src/utils/url';
 
 const StyledBoxThumbNote = styled(Box)(({ theme }) => ({
     alignIitems: 'center',
@@ -14,12 +16,10 @@ const StyledBoxThumbNote = styled(Box)(({ theme }) => ({
     justifyContent: 'center',
     border: '1px dashed rgb(45, 55, 72)',
     borderRadius: '8px',
-    height: '230px',
     padding: '24px',
     [`.${typographyClasses.root}`]: {
         fontSize: '1rem',
         color: theme.palette.grey[600],
-        // textAlign: 'center',
     },
 }));
 
@@ -36,72 +36,96 @@ const StyledRemoveThumbButton = styled(IconButton)(({ theme }) => ({
     },
 }));
 
-const ImageUpload = () => {
+export interface IImageUploadProps {
+    thumbUrl: string;
+}
 
-    const [file, setFile] = useState<File>();
+const ImageUpload = ({ thumbUrl }: IImageUploadProps) => {
+    const [thumbUrlState, setThumb] = useState<string>(thumbUrl);
+    const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFile(e.target.files[0]);
-    }
-  };
+    const handleClick = (event) => {
+        hiddenFileInputRef.current?.click();
+    };
 
-  const handleUploadClick = () => {
-    if (!file) {
-      return;
-    }
+    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const _file = e.target.files[0];
+            console.log('file', e.target.files[0]);
+            const resp = await ContentService.uploadImage(_file);
+            if (resp.success) {
+                setThumb(resp.image?.url);
+            }
+        }
+    };
 
-    // 👇 Uploading the file using the fetch API to the server
-    fetch('https://httpbin.org/post', {
-      method: 'POST',
-      body: file,
-      // 👇 Set headers manually for single file upload
-      headers: {
-        'content-type': file.type,
-        'content-length': `${file.size}`, // 👈 Headers need to be a string
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.error(err));
-  };
+    useEffect(() => {
+        setThumb(thumbUrl);
+    }, [thumbUrl]);
+
+    const onRemoveThumb = () => {
+        setThumb('');
+    };
+
+    console.log('thumbUrlState', thumbUrlState);
 
     return (
         <Card sx={{ maxWidth: '100%', boxShadow: 'none', overflow: 'visible' }}>
             <Box sx={{ position: 'relative' }}>
-                <CardMedia
-                    sx={{
-                        height: 140,
-                        borderRadius: 1,
-                    }}
-                    image="http://localhost:5000/statics/images/light-liu.jpg"
-                    title="green iguana"
-                />
-                <StyledRemoveThumbButton aria-label="delete" size="small">
-                    <ClearIcon fontSize="inherit" />
-                </StyledRemoveThumbButton>
+                {thumbUrlState && (
+                    <>
+                        <CardMedia
+                            sx={{
+                                height: 140,
+                                borderRadius: 1,
+                            }}
+                            image={thumbUrlState}
+                        ></CardMedia>
+                        <StyledRemoveThumbButton
+                            aria-label="delete"
+                            size="small"
+                            onClick={() => onRemoveThumb()}
+                        >
+                            <ClearIcon fontSize="inherit" />
+                        </StyledRemoveThumbButton>
+                    </>
+                )}
+                {!thumbUrlState && (
+                    <StyledBoxThumbNote
+                        sx={{
+                            textAlign: 'center',
+                            height: 140,
+                        }}
+                    >
+                        <Typography variant="h6" gutterBottom>
+                            Chọn một ảnh thumbnail
+                        </Typography>
+                        <Typography variant="h6" gutterBottom>
+                            Ảnh được sử dụng để làm thumbnail và open graph meta
+                        </Typography>
+                    </StyledBoxThumbNote>
+                )}
             </Box>
-            {/* <StyledBoxThumbNote>
-                <Typography variant="h6" gutterBottom>
-                    Chọn một ảnh thumbnail
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    Ảnh được sử dụng để làm thumbnail và open graph meta
-                </Typography>
-            </StyledBoxThumbNote> */}
             <StyledBoxThumbNote
                 sx={{
                     mt: 2,
                     cursor: 'pointer',
                     flexDirection: 'row',
                     alignItems: 'center',
+                    '&:hover': {
+                        backgroundColor: 'rgba(243, 244, 246, 0.04)',
+                        cursor: 'pointer',
+                        opacity: 0.5,
+                    },
                 }}
-                onClick={handleUploadClick}
+                onClick={handleClick}
             >
                 <input
                     accept="image/*"
                     type="file"
+                    ref={hiddenFileInputRef}
                     onChange={handleFileChange}
+                    style={{ display: 'none' }}
                 />
                 <Avatar sx={{ width: 64, height: 64 }}>
                     <CloudUploadIcon />
