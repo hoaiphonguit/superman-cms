@@ -102,13 +102,13 @@ router.get('/:id', verifyToken, async (req, res) => {
 
         await client.connect();
 
-        const cachePost = client.get(`${CACHE_KEY}_${req.params.id}`);
-        console.log('cachePost', cachePost);
+        const cachePost = await client.get(`${CACHE_KEY}_${req.params.id}`);
+        console.log('cachePost', cachePost, `${CACHE_KEY}_${req.params.id}`);
 
-        if (!cachePost) {
+        if (cachePost) {
             return res.status(200).json({
                 success: true,
-                post: cachePost,
+                post: JSON.parse(cachePost),
             });
         } else {
             let post = await Post.findOne(postCondition).lean();
@@ -126,7 +126,7 @@ router.get('/:id', verifyToken, async (req, res) => {
                 thumbUrl: getImageUrl(post.thumbUrl),
             };
 
-            client.set(`${CACHE_KEY}_${req.params.id}`, post);
+            await client.set(`${CACHE_KEY}_${req.params.id}`, JSON.stringify(post));
 
             return res.status(200).json({
                 success: true,
