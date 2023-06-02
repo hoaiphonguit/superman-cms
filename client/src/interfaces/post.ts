@@ -1,3 +1,4 @@
+import { RawDraftContentState } from 'draft-js';
 import { IUser } from './auth';
 
 export enum EPostStatus {
@@ -19,4 +20,6 @@ export interface IPost {
     author: IUser;
     createdAt: number;
     publishDate: number;
+    htmlBody: string;
+    jsonBody: RawDraftContentState;
 }

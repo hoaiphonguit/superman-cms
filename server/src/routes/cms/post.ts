@@ -1,9 +1,18 @@
 import * as express from 'express';
-import { verifyToken } from '../middleware/auth';
-import Post from '../model/post';
-import { validUrl } from '../utils/string';
-import { getImageUrl } from '../utils/url';
+import * as redis from 'redis';
+import { verifyToken } from 'src/middleware/auth';
+import Post from 'src/model/post';
+import { validUrl } from 'src/utils/string';
+import { getImageUrl } from 'src/utils/url';
 const router = express.Router();
+const CACHE_KEY = 'POST';
+
+const client = redis.createClient();
+
+// echo redis errors to the console
+client.on('error', (err) => {
+    console.log('Error ' + err);
+});
 
 /**
  * @route POST /api/post/create
@@ -11,7 +20,14 @@ const router = express.Router();
  * @access Private
  */
 router.post('/create', verifyToken, async (req, res) => {
-    const { title, description, status, url = '' } = req.body;
+    const {
+        title,
+        description,
+        status,
+        url = '',
+        htmlBody,
+        jsonBody,
+    } = req.body;
 
     if (!title || !description) {
         return res.status(400).json({
@@ -26,6 +42,8 @@ router.post('/create', verifyToken, async (req, res) => {
             description,
             status: status || 0,
             url: validUrl(url),
+            htmlBody,
+            jsonBody,
             author: req['userId'],
         });
 
@@ -38,7 +56,7 @@ router.post('/create', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
@@ -63,7 +81,7 @@ router.get('/list', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
@@ -82,31 +100,47 @@ router.get('/:id', verifyToken, async (req, res) => {
             author: req['userId'],
         };
 
-        let post = await Post.findOne(postCondition).lean();
+        await client.connect();
 
-        // User not authorised to update post or post not found
-        if (!post) {
-            return res.status(401).json({
-                success: false,
-                message: 'Post not found or user not authorised',
+        const cachePost = client.get(`${CACHE_KEY}_${req.params.id}`);
+        console.log('cachePost', cachePost);
+
+        if (!cachePost) {
+            return res.status(200).json({
+                success: true,
+                post: cachePost,
+            });
+        } else {
+            let post = await Post.findOne(postCondition).lean();
+
+            // User not authorised to update post or post not found
+            if (!post) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Post not found or user not authorised',
+                });
+            }
+
+            post = {
+                ...post,
+                thumbUrl: getImageUrl(post.thumbUrl),
+            };
+
+            client.set(`${CACHE_KEY}_${req.params.id}`, post);
+
+            return res.status(200).json({
+                success: true,
+                post,
             });
         }
-
-        post = {
-            ...post,
-            thumbUrl: getImageUrl(post.thumbUrl),
-        };
-
-        return res.status(200).json({
-            success: true,
-            post,
-        });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
+    } finally {
+        await client.disconnect();
     }
 });
 
@@ -116,7 +150,7 @@ router.get('/:id', verifyToken, async (req, res) => {
  * @access Private
  */
 router.put('/:id', verifyToken, async (req, res) => {
-    const { title, description, status, url } = req.body;
+    const { title, description, status, url, htmlBody, jsonBody } = req.body;
     if (!title || !description || status == undefined) {
         return res.status(400).json({
             success: false,
@@ -124,9 +158,11 @@ router.put('/:id', verifyToken, async (req, res) => {
         });
     }
     try {
-        let updatePost = {
+        const updatePost = {
             title,
             description,
+            htmlBody,
+            jsonBody,
             status: status,
             url: validUrl(url) || '',
             modifiedDate: new Date().getTime(),
@@ -137,14 +173,14 @@ router.put('/:id', verifyToken, async (req, res) => {
             author: req['userId'],
         };
 
-        updatePost = await Post.findOneAndUpdate(
+        const updatePostResp = await Post.findOneAndUpdate(
             postUpdateCondition,
             updatePost,
             { new: true }
         );
 
         // User not authorised to update post or post not found
-        if (!updatePost) {
+        if (!updatePostResp) {
             return res.status(401).json({
                 success: false,
                 message: 'Post not found or user not authorised',
@@ -158,7 +194,7 @@ router.put('/:id', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
@@ -197,7 +233,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });

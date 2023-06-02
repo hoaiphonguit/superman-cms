@@ -1,6 +1,6 @@
 import * as express from 'express';
-import { verifyToken } from '../middleware/auth';
-import Navigation from '../model/navigation';
+import { verifyToken } from 'src/middleware/auth';
+import Navigation from 'src/model/navigation';
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
  * @desc Get app navigations
  * @access Private
  */
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', verifyToken, async (_req, res) => {
     try {
         const list = await Navigation.find();
 
@@ -19,7 +19,7 @@ router.get('/', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });

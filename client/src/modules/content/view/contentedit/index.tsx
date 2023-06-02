@@ -13,7 +13,7 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { convertToRaw, EditorState } from 'draft-js';
+import { ContentState, convertFromHTML, convertToRaw, EditorState } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import { isEmpty } from 'lodash';
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -65,9 +65,33 @@ const PostEditView = () => {
 
     const post: IPost = getState.value?.post || {};
 
+    useEffect(() => {
+        if (post?.htmlBody) {
+            const blocksFromHtml = convertFromHTML(post.htmlBody);
+            const { contentBlocks, entityMap } = blocksFromHtml;
+            const contentState = ContentState.createFromBlockArray(
+                contentBlocks,
+                entityMap
+            );
+            setEditorState(EditorState.createWithContent(contentState));
+        }
+    }, [post]);
+
     const onSubmit = (data: Partial<IPost>) => {
         console.log(data, data);
-        id ? updateFn(id, data) : cretateFn(data);
+        console.log(
+            'editorState',
+            draftToHtml(convertToRaw(editorState.getCurrentContent()))
+        );
+
+        const _data = {
+            ...data,
+            htmlBody: draftToHtml(
+                convertToRaw(editorState.getCurrentContent())
+            ),
+            jsonBody: convertToRaw(editorState.getCurrentContent())
+        };
+        id ? updateFn(id, _data) : cretateFn(_data);
     };
 
     const fieldsConfig = useMemo(() => fields(post), [post]);

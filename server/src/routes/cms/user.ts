@@ -1,6 +1,6 @@
 import * as express from 'express';
-import { verifyToken } from '../middleware/auth';
-import User from '../model/user';
+import { verifyToken } from 'src/middleware/auth';
+import User from 'src/model/user';
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
  * @desc Get user list
  * @access Private
  */
-router.get('/list', verifyToken, async (req, res) => {
+router.get('/list', verifyToken, async (_req, res) => {
     try {
         const list = await User.find({ deleted: 0 }).select([
             '-password',
@@ -22,7 +22,7 @@ router.get('/list', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
@@ -43,7 +43,7 @@ router.put('/:id', verifyToken, async (req, res) => {
         });
     }
     try {
-        let updateUser = {
+        const updateUser = {
             name,
             phone,
             baned,
@@ -51,14 +51,14 @@ router.put('/:id', verifyToken, async (req, res) => {
 
         const userUpdateCondition = { _id: req.params.id, username };
 
-        updateUser = await User.findOneAndUpdate(
+        const updateUserResp = await User.findOneAndUpdate(
             userUpdateCondition,
             updateUser,
             { new: true }
         );
 
         // User not authorised to update post or post not found
-        if (!updateUser) {
+        if (!updateUserResp) {
             return res.status(401).json({
                 success: false,
                 message: 'User not found',
@@ -71,7 +71,7 @@ router.put('/:id', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
@@ -107,7 +107,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
@@ -135,7 +135,7 @@ router.get('/:id', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });

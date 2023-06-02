@@ -1,8 +1,8 @@
 import * as argon2 from 'argon2';
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
-import { verifyToken } from '../middleware/auth';
-import User from '../model/user';
+import { verifyToken } from 'src/middleware/auth';
+import User from 'src/model/user';
 
 const router = express.Router();
 
@@ -50,7 +50,7 @@ router.post('/register', async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
@@ -106,7 +106,7 @@ router.post('/login', async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });
@@ -143,7 +143,7 @@ router.get('/', verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
         });

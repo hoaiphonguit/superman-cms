@@ -6,8 +6,29 @@
         "sourceMap": true,
         "target": "es6",
         "outDir": "./dist",
-        "baseUrl": "./src/server"
+        "baseUrl": "./",
+        "rootDir": "./src",
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": false,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "importHelpers": true,
+        "strictNullChecks": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "incremental": true,
+        "allowJs": true,
+        "useUnknownInCatchVariables": false,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true
     },
-    "include": ["src/**/*.ts"],
+    "ts-node": {
+        "require": ["tsconfig-paths/register"]
+    },
+    "include": ["src/**/*.ts", "src/server.ts"],
     "exclude": ["node_modules"]
 }

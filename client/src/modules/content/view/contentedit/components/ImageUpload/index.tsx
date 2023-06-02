@@ -7,7 +7,6 @@ import Typography, { typographyClasses } from '@mui/material/Typography';
 import { Box } from '@mui/system';
 import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
 import ContentService from 'src/modules/content/service';
-import { getImageUrl } from 'src/utils/url';
 
 const StyledBoxThumbNote = styled(Box)(({ theme }) => ({
     alignIitems: 'center',
@@ -84,7 +83,7 @@ const ImageUpload = ({ thumbUrl }: IImageUploadProps) => {
                         <StyledRemoveThumbButton
                             aria-label="delete"
                             size="small"
-                            onClick={() => onRemoveThumb()}
+                            onClick={onRemoveThumb}
                         >
                             <ClearIcon fontSize="inherit" />
                         </StyledRemoveThumbButton>
