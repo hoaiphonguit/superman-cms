@@ -8,10 +8,17 @@ import {
     postCMSRouter,
     userCMSRouter,
 } from './routes/cms';
+import * as redis from 'redis';
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 const app = express();
+export const redisClient = redis.createClient();
+
+// echo redis errors to the console
+redisClient.on('error', (err) => {
+    console.log('Error ' + err);
+});
 
 app.use(cors());
 app.use(express.json());

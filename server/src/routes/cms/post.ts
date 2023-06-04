@@ -1,18 +1,12 @@
 import * as express from 'express';
-import * as redis from 'redis';
 import { verifyToken } from 'src/middleware/auth';
 import Post from 'src/model/post';
 import { validUrl } from 'src/utils/string';
 import { getImageUrl } from 'src/utils/url';
+import _ from 'lodash';
+import { redisClient } from 'src/server';
 const router = express.Router();
 const CACHE_KEY = 'POST';
-
-const client = redis.createClient();
-
-// echo redis errors to the console
-client.on('error', (err) => {
-    console.log('Error ' + err);
-});
 
 /**
  * @route POST /api/post/create
@@ -49,10 +43,43 @@ router.post('/create', verifyToken, async (req, res) => {
 
         await newPost.save();
 
+        await redisClient.connect();
+
+        await redisClient.set(
+            `${CACHE_KEY}_${newPost._id}`,
+            JSON.stringify(newPost)
+        );
+
         return res.json({
             success: true,
             message: 'Post created successfully',
             post: newPost,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    } finally {
+        await redisClient.disconnect();
+    }
+});
+
+/**
+ * @route GET /api/post/list
+ * @desc Get post list
+ * @access Private
+ */
+router.get('/allList', verifyToken, async (_req, res) => {
+    try {
+        const list = await Post.find({
+            deleted: false,
+        }).populate('author');
+
+        return res.json({
+            success: true,
+            list,
         });
     } catch (error) {
         console.log(error);
@@ -68,12 +95,14 @@ router.post('/create', verifyToken, async (req, res) => {
  * @desc Get post list
  * @access Private
  */
-router.get('/list', verifyToken, async (req, res) => {
+router.get('/myList', verifyToken, async (req, res) => {
     try {
         const list = await Post.find({
-            authorId: req['userId'],
+            author: req['userId'],
             deleted: false,
         }).populate('author');
+
+        console.log('userId', req['userId']);
 
         return res.json({
             success: true,
@@ -100,12 +129,13 @@ router.get('/:id', verifyToken, async (req, res) => {
             author: req['userId'],
         };
 
-        await client.connect();
+        await redisClient.connect();
 
-        const cachePost = await client.get(`${CACHE_KEY}_${req.params.id}`);
+        const cachePost =
+            (await redisClient.get(`${CACHE_KEY}_${req.params.id}`)) || '';
         console.log('cachePost', cachePost, `${CACHE_KEY}_${req.params.id}`);
 
-        if (cachePost) {
+        if (!_.isEmpty(cachePost)) {
             return res.status(200).json({
                 success: true,
                 post: JSON.parse(cachePost),
@@ -114,7 +144,7 @@ router.get('/:id', verifyToken, async (req, res) => {
             let post = await Post.findOne(postCondition).lean();
 
             // User not authorised to update post or post not found
-            if (!post) {
+            if (_.isEmpty(post)) {
                 return res.status(401).json({
                     success: false,
                     message: 'Post not found or user not authorised',
@@ -126,7 +156,10 @@ router.get('/:id', verifyToken, async (req, res) => {
                 thumbUrl: getImageUrl(post.thumbUrl),
             };
 
-            await client.set(`${CACHE_KEY}_${req.params.id}`, JSON.stringify(post));
+            await redisClient.set(
+                `${CACHE_KEY}_${req.params.id}`,
+                JSON.stringify(post)
+            );
 
             return res.status(200).json({
                 success: true,
@@ -140,7 +173,7 @@ router.get('/:id', verifyToken, async (req, res) => {
             message: 'Internal server error',
         });
     } finally {
-        await client.disconnect();
+        await redisClient.disconnect();
     }
 });
 
@@ -187,6 +220,12 @@ router.put('/:id', verifyToken, async (req, res) => {
             });
         }
 
+        await redisClient.connect();
+        await redisClient.set(
+            `${CACHE_KEY}_${req.params.id}`,
+            JSON.stringify(updatePost)
+        );
+
         return res.status(200).json({
             success: true,
             message: 'Post update successfully',
@@ -198,6 +237,8 @@ router.put('/:id', verifyToken, async (req, res) => {
             success: false,
             message: 'Internal server error',
         });
+    } finally {
+        await redisClient.disconnect();
     }
 });
 
@@ -226,6 +267,9 @@ router.delete('/:id', verifyToken, async (req, res) => {
             });
         }
 
+        await redisClient.connect();
+        await redisClient.del(`${CACHE_KEY}_${req.params.id}`);
+
         return res.status(200).json({
             success: true,
             message: 'Post delete successfully',
@@ -237,6 +281,8 @@ router.delete('/:id', verifyToken, async (req, res) => {
             success: false,
             message: 'Internal server error',
         });
+    } finally {
+        await redisClient.disconnect();
     }
 });
 
